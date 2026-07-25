@@ -20,7 +20,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/sivaosorg/timefy"
+	"github.com/polarixa/timefy"
 )
 
 // Severity classifies an audit event.

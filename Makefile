@@ -42,12 +42,11 @@ build-cli:
 # Module support and testing
 # Runs tests across all packages in the project, showing code coverage.
 test:
-	go test -cover ./...
+	go test -count=1 -cover ./...
 
 # Cleans up the module by removing unused dependencies, then re-vendors.
 tidy:
 	go mod tidy
-	go mod vendor
 
 # ==============================================================================
 # Upgrading dependencies
@@ -56,7 +55,6 @@ tidy:
 deps-upgrade:
 	go get -u -t -d -v ./...
 	go mod tidy
-	go mod vendor
 
 # Removes all items from the Go module cache.
 deps-clean-cache:

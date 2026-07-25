@@ -13,12 +13,12 @@ To install, you can use the following commands based on your preference:
 - For a specific version:
 
   ```bash
-  go get github.com/sivaosorg/timefy@v0.0.3
+  go get github.com/polarixa/timefy@v0.0.3
   ```
 
 - For the latest version:
   ```bash
-  go get github.com/sivaosorg/timefy@latest
+  go get github.com/polarixa/timefy@latest
   ```
 
 ### Getting started
@@ -28,7 +28,7 @@ To install, you can use the following commands based on your preference:
 With [Go's module support](https://go.dev/wiki/Modules#how-to-use-modules), `go [build|run|test]` automatically fetches the necessary dependencies when you add the import in your code:
 
 ```go
-import "github.com/sivaosorg/timefy"
+import "github.com/polarixa/timefy"
 ```
 
 #### Usage
@@ -42,7 +42,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sivaosorg/timefy"
+	"github.com/polarixa/timefy"
 )
 
 func main() {
@@ -64,7 +64,7 @@ func main() {
 	fmt.Println(tx.EndOfQuarter())       // 2024-12-31 23:59:59.999999999 +0700 +07
 	fmt.Println(tx.EndOfHalf())          // 2024-12-31 23:59:59.999999999 +0700 +07
 	fmt.Println(tx.EndOfYear())          // 2024-12-31 23:59:59.999999999 +0700 +07
-	
+
 	fmt.Println(tx.EndOfWeek())          // 2024-10-28 23:59:59.999999999 +0700 +07
 }
 ```
@@ -78,7 +78,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sivaosorg/timefy"
+	"github.com/polarixa/timefy"
 )
 
 func main() {
@@ -98,7 +98,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sivaosorg/timefy"
+	"github.com/polarixa/timefy"
 )
 
 func main() {
@@ -121,7 +121,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sivaosorg/timefy"
+	"github.com/polarixa/timefy"
 )
 
 func main() {
@@ -148,7 +148,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/sivaosorg/timefy"
+	"github.com/polarixa/timefy"
 )
 
 func main() {
@@ -188,7 +188,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sivaosorg/timefy"
+	"github.com/polarixa/timefy"
 )
 
 func main() {
@@ -215,7 +215,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sivaosorg/timefy"
+	"github.com/polarixa/timefy"
 )
 
 func main() {
@@ -244,7 +244,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sivaosorg/timefy"
+	"github.com/polarixa/timefy"
 )
 
 func main() {
@@ -277,7 +277,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sivaosorg/timefy"
+	"github.com/polarixa/timefy"
 )
 
 func main() {
@@ -309,7 +309,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sivaosorg/timefy"
+	"github.com/polarixa/timefy"
 )
 
 func main() {
@@ -338,7 +338,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/sivaosorg/timefy"
+	"github.com/polarixa/timefy"
 )
 
 func main() {
@@ -360,7 +360,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sivaosorg/timefy"
+	"github.com/polarixa/timefy"
 )
 
 func main() {
@@ -382,7 +382,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sivaosorg/timefy"
+	"github.com/polarixa/timefy"
 )
 
 func main() {
@@ -408,7 +408,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sivaosorg/timefy"
+	"github.com/polarixa/timefy"
 )
 
 func main() {
@@ -432,7 +432,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sivaosorg/timefy"
+	"github.com/polarixa/timefy"
 )
 
 func main() {
@@ -453,7 +453,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sivaosorg/timefy"
+	"github.com/polarixa/timefy"
 )
 
 func main() {
@@ -488,7 +488,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sivaosorg/timefy"
+	"github.com/polarixa/timefy"
 )
 
 func main() {
@@ -519,7 +519,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sivaosorg/timefy"
+	"github.com/polarixa/timefy"
 )
 
 func main() {
@@ -553,7 +553,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sivaosorg/timefy"
+	"github.com/polarixa/timefy"
 )
 
 func main() {
@@ -579,7 +579,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sivaosorg/timefy"
+	"github.com/polarixa/timefy"
 )
 
 func main() {
@@ -625,7 +625,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sivaosorg/timefy"
+	"github.com/polarixa/timefy"
 )
 
 func main() {
@@ -660,7 +660,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/sivaosorg/timefy"
+	"github.com/polarixa/timefy"
 )
 
 func main() {
@@ -692,7 +692,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sivaosorg/timefy"
+	"github.com/polarixa/timefy"
 )
 
 func main() {
@@ -747,7 +747,7 @@ To contribute to project, follow these steps:
 1. Clone the repository:
 
    ```bash
-   git clone --depth 1 https://github.com/sivaosorg/timefy.git
+   git clone --depth 1 https://github.com/polarixa/timefy.git
    ```
 
 2. Navigate to the project directory:

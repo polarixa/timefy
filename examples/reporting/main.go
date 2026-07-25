@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sivaosorg/timefy"
+	"github.com/polarixa/timefy"
 )
 
 // QuarterPeriod holds the boundaries and metadata for a single reporting quarter.

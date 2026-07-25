@@ -82,22 +82,22 @@ constantly in production software.
 ### Why `timefy` exists
 
 The standard library's `time.Time` is precise and correct, but deliberately
-minimal.  Everyday tasks require boilerplate that is easy to get wrong:
+minimal. Everyday tasks require boilerplate that is easy to get wrong:
 
-| Task | Standard Library | timefy |
-|------|-----------------|--------|
-| Start of current month | `time.Date(y, m, 1, 0, 0, 0, 0, loc)` | `With(now).BeginningOfMonth()` |
-| Last day of quarter | `complex 3-step calculation` | `With(now).EndOfQuarter()` |
-| Parse any of 40+ formats | `try each format manually` | `Parse("2025-03-15")` |
-| "5 minutes ago" | `manual switch-case` | `New(t).TimeAgo()` |
-| Is this a weekday? | `t.Weekday() != Sat && != Sun` | `New(t).IsWeekday()` |
+| Task                     | Standard Library                      | timefy                         |
+| ------------------------ | ------------------------------------- | ------------------------------ |
+| Start of current month   | `time.Date(y, m, 1, 0, 0, 0, 0, loc)` | `With(now).BeginningOfMonth()` |
+| Last day of quarter      | `complex 3-step calculation`          | `With(now).EndOfQuarter()`     |
+| Parse any of 40+ formats | `try each format manually`            | `Parse("2025-03-15")`          |
+| "5 minutes ago"          | `manual switch-case`                  | `New(t).TimeAgo()`             |
+| Is this a weekday?       | `t.Weekday() != Sat && != Sun`        | `New(t).IsWeekday()`           |
 
 ### Design decisions
 
 1. **Immutability**: all boundary methods return new `time.Time` values;
    the wrapped `Timex` is never mutated.
 2. **Nanosecond precision at boundaries**: `EndOfDay` returns
-   `23:59:59.999999999`, not `23:59:59.000000000`.  This is critical for
+   `23:59:59.999999999`, not `23:59:59.000000000`. This is critical for
    inclusive range queries in databases.
 3. **Zero external dependencies**: the module's only import is the standard
    library.
@@ -154,14 +154,14 @@ and carries a `*Rule` pointer that governs:
 
 ```bash
 # Specific version
-go get github.com/sivaosorg/timefy@v0.0.3
+go get github.com/polarixa/timefy@v0.0.3
 
 # Latest
-go get github.com/sivaosorg/timefy@latest
+go get github.com/polarixa/timefy@latest
 ```
 
 ```go
-import "github.com/sivaosorg/timefy"
+import "github.com/polarixa/timefy"
 ```
 
 **Minimum Go version:** 1.23.1
@@ -224,7 +224,7 @@ const (
 type ZoneRFC string
 ```
 
-`ZoneRFC` wraps an IANA timezone name string.  The type prevents accidentally
+`ZoneRFC` wraps an IANA timezone name string. The type prevents accidentally
 passing a format string where a timezone name is expected.
 
 ```go
@@ -251,7 +251,7 @@ type Rule struct {
 ```
 
 `Rule` is constructed with `NewRule()` and configured through a fluent
-builder pattern.  It is then used to create `Timex` values via `rule.With(t)`.
+builder pattern. It is then used to create `Timex` values via `rule.With(t)`.
 
 ```go
 rule := timefy.NewRule().
@@ -292,7 +292,7 @@ import (
     "fmt"
     "time"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -344,7 +344,7 @@ import (
     "fmt"
     "time"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -381,7 +381,7 @@ import (
     "fmt"
     "time"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -419,7 +419,7 @@ import (
     "fmt"
     "time"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -441,9 +441,9 @@ func main() {
 ```
 
 **Why week-start matters:**
-The ISO 8601 standard defines the week as Monday–Sunday.  Many European
+The ISO 8601 standard defines the week as Monday–Sunday. Many European
 companies, regulatory bodies, and international standards use this calendar.
-The default Sunday–Saturday week is the US convention.  `timefy` allows
+The default Sunday–Saturday week is the US convention. `timefy` allows
 both via `WithWeekStartDay`.
 
 ### 6.4 Month Boundaries
@@ -455,7 +455,7 @@ import (
     "fmt"
     "time"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -486,9 +486,11 @@ func main() {
 ```
 
 **Implementation insight:** `EndOfMonth` is computed as:
+
 ```
 BeginningOfMonth().AddDate(0, 1, 0).Add(-time.Nanosecond)
 ```
+
 By adding 1 month to the first day and subtracting 1 nanosecond, the
 month-length calculation is delegated entirely to Go's `AddDate`, which
 handles all month-length and leap-year arithmetic correctly.
@@ -502,7 +504,7 @@ import (
     "fmt"
     "time"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -531,10 +533,12 @@ func main() {
 ```
 
 **Implementation insight:** `BeginningOfQuarter` computes:
+
 ```
 offset = (currentMonth - 1) % 3   // months into the current quarter
 start  = BeginningOfMonth().AddDate(0, -offset, 0)
 ```
+
 This yields Q1 for month 1 (offset=0), month 2 (offset=1), month 3 (offset=2).
 
 ### 6.6 Half-Year Boundaries
@@ -546,7 +550,7 @@ import (
     "fmt"
     "time"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -575,7 +579,7 @@ import (
     "fmt"
     "time"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -598,7 +602,7 @@ package main
 import (
     "fmt"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -635,7 +639,7 @@ import (
     "fmt"
     "time"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -671,7 +675,7 @@ import (
     "fmt"
     "time"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -708,7 +712,7 @@ func main() {
 
 `timefy` maintains a global `TimeFormats` slice containing 40+ patterns.
 When parsing, the library tries each pattern in order and returns the
-first successful match.  Missing components are filled in from the reference
+first successful match. Missing components are filled in from the reference
 time (typically `time.Now()`).
 
 ```go
@@ -735,7 +739,7 @@ package main
 import (
     "fmt"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -785,7 +789,7 @@ package main
 import (
     "fmt"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -808,7 +812,7 @@ import (
     "fmt"
     "time"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -843,7 +847,7 @@ package main
 import (
     "fmt"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func init() {
@@ -877,7 +881,7 @@ The reference timestamp is:
 Mon Jan 2 15:04:05 MST 2006
 ```
 
-which encoded numerically is `01/02 03:04:05PM '06 -0700`.  Every format
+which encoded numerically is `01/02 03:04:05PM '06 -0700`. Every format
 string in `timefy` (and in Go) uses this reference.
 
 ```
@@ -894,7 +898,7 @@ import (
     "fmt"
     "time"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -943,7 +947,7 @@ import (
     "fmt"
     "time"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -981,7 +985,7 @@ import (
     "fmt"
     "time"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -1021,7 +1025,7 @@ import (
     "fmt"
     "time"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -1056,7 +1060,7 @@ import (
     "fmt"
     "time"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -1092,7 +1096,7 @@ import (
     "fmt"
     "time"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -1127,7 +1131,7 @@ func main() {
 ### 13.1 TimeAgo
 
 `TimeAgo` returns a natural-language string describing how long ago a past
-time occurred.  It uses `time.Now()` as the reference point.
+time occurred. It uses `time.Now()` as the reference point.
 
 ```go
 package main
@@ -1136,7 +1140,7 @@ import (
     "fmt"
     "time"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -1179,21 +1183,21 @@ func main() {
 
 **Threshold table:**
 
-| Condition | Output |
-|-----------|--------|
-| `seconds < 60` | `"just now"` |
-| `minutes < 2` | `"1 minute ago"` |
+| Condition      | Output            |
+| -------------- | ----------------- |
+| `seconds < 60` | `"just now"`      |
+| `minutes < 2`  | `"1 minute ago"`  |
 | `minutes < 60` | `"N minutes ago"` |
-| `hours < 2` | `"1 hour ago"` |
-| `hours < 24` | `"N hours ago"` |
-| `days < 2` | `"1 day ago"` |
-| `days < 7` | `"N days ago"` |
-| `days < 14` | `"1 week ago"` |
-| `days < 30` | `"N weeks ago"` |
-| `days < 60` | `"1 month ago"` |
-| `days < 365` | `"N months ago"` |
-| `days < 730` | `"1 year ago"` |
-| else | `"N years ago"` |
+| `hours < 2`    | `"1 hour ago"`    |
+| `hours < 24`   | `"N hours ago"`   |
+| `days < 2`     | `"1 day ago"`     |
+| `days < 7`     | `"N days ago"`    |
+| `days < 14`    | `"1 week ago"`    |
+| `days < 30`    | `"N weeks ago"`   |
+| `days < 60`    | `"1 month ago"`   |
+| `days < 365`   | `"N months ago"`  |
+| `days < 730`   | `"1 year ago"`    |
+| else           | `"N years ago"`   |
 
 ### 13.2 TimeUntil
 
@@ -1207,7 +1211,7 @@ import (
     "fmt"
     "time"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -1249,7 +1253,7 @@ import (
     "fmt"
     "time"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -1286,7 +1290,7 @@ func main() {
 
 **Important caveat:**
 `DurationInDays` uses `t.Sub(other).Hours() / 24`, which measures wall-clock
-hours.  This can differ from calendar days across DST boundaries.  For
+hours. This can differ from calendar days across DST boundaries. For
 calendar-day semantics across DST, use `AddDate(0, 0, n)` and count manually.
 
 ---
@@ -1302,7 +1306,7 @@ import (
     "fmt"
     "time"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -1328,7 +1332,7 @@ import (
     "fmt"
     "time"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -1356,7 +1360,7 @@ import (
     "fmt"
     "time"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -1386,7 +1390,7 @@ import (
     "fmt"
     "time"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -1409,7 +1413,7 @@ import (
     "fmt"
     "time"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -1441,7 +1445,7 @@ package main
 import (
     "fmt"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -1466,7 +1470,7 @@ import (
     "fmt"
     "time"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -1499,7 +1503,7 @@ import (
     "fmt"
     "time"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -1541,7 +1545,7 @@ import (
     "fmt"
     "time"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -1565,8 +1569,8 @@ func main() {
 
 **Known limitation:** `GetWeekdaysInRange` has a conditional branch that, when
 the date range falls within a leap year, only counts February 29 as a valid
-weekday and skips all other weekdays in that year.  For date ranges that fall
-entirely within a non-leap year, the function works correctly.  When working
+weekday and skips all other weekdays in that year. For date ranges that fall
+entirely within a non-leap year, the function works correctly. When working
 with date ranges that span any part of a leap year, use `IsWeekday()` in a
 manual iteration loop instead:
 
@@ -1591,7 +1595,7 @@ import (
     "fmt"
     "time"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -1618,7 +1622,7 @@ import (
     "fmt"
     "time"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -1643,7 +1647,7 @@ func main() {
 
 ## 22. Rule Configuration — Full API
 
-`Rule` is the configuration builder for `Timex`.  All methods return
+`Rule` is the configuration builder for `Timex`. All methods return
 `*Rule` for fluent chaining.
 
 ```go
@@ -1653,7 +1657,7 @@ import (
     "fmt"
     "time"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func main() {
@@ -1740,7 +1744,7 @@ import (
     "fmt"
     "time"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 var (
@@ -1786,7 +1790,7 @@ import (
     "fmt"
     "time"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 type TenantCtx struct {
@@ -1843,7 +1847,7 @@ package main
 import (
     "fmt"
 
-    "github.com/sivaosorg/timefy"
+    "github.com/polarixa/timefy"
 )
 
 func init() {
@@ -1866,13 +1870,13 @@ func main() {
 
 ### 23.4 Safe vs Panic Patterns
 
-| Scenario | Function | Behavior |
-|----------|----------|----------|
-| User input (HTTP, CLI) | `Parse`, `ParseInLocation` | Returns `error` — handle it |
-| Config file constants | `MustParse`, `MustParseInLocation` | Panics — appropriate for startup |
-| Trusted internal code | `MustParse` | Panics on programmer error |
-| Dynamic timezone from DB | `SetTimezone` | Returns `error` if TZ invalid |
-| Trusted timezone constant | `AdjustTimezone` | Silent fallback on error |
+| Scenario                  | Function                           | Behavior                         |
+| ------------------------- | ---------------------------------- | -------------------------------- |
+| User input (HTTP, CLI)    | `Parse`, `ParseInLocation`         | Returns `error` — handle it      |
+| Config file constants     | `MustParse`, `MustParseInLocation` | Panics — appropriate for startup |
+| Trusted internal code     | `MustParse`                        | Panics on programmer error       |
+| Dynamic timezone from DB  | `SetTimezone`                      | Returns `error` if TZ invalid    |
+| Trusted timezone constant | `AdjustTimezone`                   | Silent fallback on error         |
 
 ```go
 // ✅ Safe pattern for HTTP handlers:
@@ -1898,24 +1902,24 @@ that demonstrate production-grade patterns.
 ### `examples/billing/` — SaaS Subscription Billing
 
 **Business problem:** A multi-tenant SaaS platform bills customers monthly,
-quarterly, and annually.  Customers sign up mid-period and receive pro-rated
-charges.  Some plans include a free trial period.
+quarterly, and annually. Customers sign up mid-period and receive pro-rated
+charges. Some plans include a free trial period.
 
 **Key timefy APIs used:**
 
-| API | Purpose |
-|-----|---------|
-| `New(t).BeginningOfMonth()` | Start of billing period |
-| `New(t).EndOfMonth()` | End of billing period |
-| `New(t).BeginningOfQuarter()` | Q1/Q2/Q3/Q4 start |
-| `New(t).EndOfQuarter()` | Q1/Q2/Q3/Q4 end |
-| `New(t).BeginningOfYear()` | Annual period start |
-| `New(t).EndOfYear()` | Annual period end |
-| `AddDay(t, n)` | Trial expiry calculation |
-| `AdjustTimezone` | Tenant-local boundary evaluation |
-| `IsLeapYear` | February billing edge case |
-| `IsBetween` | Trial membership test |
-| `DurationInDays` | Pro-rate day counting |
+| API                           | Purpose                          |
+| ----------------------------- | -------------------------------- |
+| `New(t).BeginningOfMonth()`   | Start of billing period          |
+| `New(t).EndOfMonth()`         | End of billing period            |
+| `New(t).BeginningOfQuarter()` | Q1/Q2/Q3/Q4 start                |
+| `New(t).EndOfQuarter()`       | Q1/Q2/Q3/Q4 end                  |
+| `New(t).BeginningOfYear()`    | Annual period start              |
+| `New(t).EndOfYear()`          | Annual period end                |
+| `AddDay(t, n)`                | Trial expiry calculation         |
+| `AdjustTimezone`              | Tenant-local boundary evaluation |
+| `IsLeapYear`                  | February billing edge case       |
+| `IsBetween`                   | Trial membership test            |
+| `DurationInDays`              | Pro-rate day counting            |
 
 ```bash
 cd examples/billing && go run main.go
@@ -1923,21 +1927,21 @@ cd examples/billing && go run main.go
 
 ### `examples/global_team/` — Multi-Timezone Team Coordination
 
-**Business problem:** An engineering organization spans five cities.  The
+**Business problem:** An engineering organization spans five cities. The
 platform must find meeting overlap windows, detect business-hour availability,
 and generate cross-team working-day schedules that respect public holidays.
 
 **Key timefy APIs used:**
 
-| API | Purpose |
-|-----|---------|
-| `AdjustTimezone` | Convert UTC probe times to local |
-| `New(t).IsWeekday()` | Exclude weekends |
-| `AddHour(t, 1)` | Scan 1-hour overlap windows |
-| `AddDay(t, 1)` | Advance day cursor |
-| `New(t).IsSameDay` | Holiday matching |
-| `New(t).BeginningOfQuarter()` | Quarter display |
-| `New(t).TimeAgo()` / `TimeUntil()` | Release timeline display |
+| API                                | Purpose                          |
+| ---------------------------------- | -------------------------------- |
+| `AdjustTimezone`                   | Convert UTC probe times to local |
+| `New(t).IsWeekday()`               | Exclude weekends                 |
+| `AddHour(t, 1)`                    | Scan 1-hour overlap windows      |
+| `AddDay(t, 1)`                     | Advance day cursor               |
+| `New(t).IsSameDay`                 | Holiday matching                 |
+| `New(t).BeginningOfQuarter()`      | Quarter display                  |
+| `New(t).TimeAgo()` / `TimeUntil()` | Release timeline display         |
 
 ```bash
 cd examples/global_team && go run main.go
@@ -1951,18 +1955,18 @@ breaches for support tickets, and generates CISO reports.
 
 **Key timefy APIs used:**
 
-| API | Purpose |
-|-----|---------|
-| `AddHour(t, 72)` | GDPR 72-hour notification deadline |
-| `AddHour(t, 1)` | Business-hour SLA clock ticking |
-| `New(t).IsWeekday()` | SLA clock excludes weekends |
-| `New(t).BeginningOfHour()` | Hourly event bucketing |
-| `New(t).IsBetween` | Events-in-window query |
-| `New(t).BeginningOfWeek()` / `EndOfWeek()` | Weekly report window |
-| `New(t).BeginningOfQuarter()` / `Quarter()` | Quarterly KPI window |
-| `BeginOfDay` / `AddDay` | 90-day retention threshold |
-| `FormatTimex` | Structured log timestamp extraction |
-| `New(t).TimeAgo()` | Human-readable event age |
+| API                                         | Purpose                             |
+| ------------------------------------------- | ----------------------------------- |
+| `AddHour(t, 72)`                            | GDPR 72-hour notification deadline  |
+| `AddHour(t, 1)`                             | Business-hour SLA clock ticking     |
+| `New(t).IsWeekday()`                        | SLA clock excludes weekends         |
+| `New(t).BeginningOfHour()`                  | Hourly event bucketing              |
+| `New(t).IsBetween`                          | Events-in-window query              |
+| `New(t).BeginningOfWeek()` / `EndOfWeek()`  | Weekly report window                |
+| `New(t).BeginningOfQuarter()` / `Quarter()` | Quarterly KPI window                |
+| `BeginOfDay` / `AddDay`                     | 90-day retention threshold          |
+| `FormatTimex`                               | Structured log timestamp extraction |
+| `New(t).TimeAgo()`                          | Human-readable event age            |
 
 ```bash
 cd examples/audit && go run main.go
@@ -1976,19 +1980,19 @@ calendar.
 
 **Key timefy APIs used:**
 
-| API | Purpose |
-|-----|---------|
-| `New(t).BeginningOfQuarter()` | Calendar Q1–Q4 start |
-| `New(t).EndOfQuarter()` | Calendar Q1–Q4 end |
-| `New(t).BeginningOfYear()` | YTD start |
-| `New(t).EndOfYear()` | Year-end boundary |
-| `New(t).BeginningOfHalf()` | H1/H2 start |
-| `AddDay(t, 45)` | 10-Q filing deadline |
-| `AddDay(t, 60)` | 10-K filing deadline |
-| `New(t).DurationInDays` | Days-until-deadline countdown |
-| `GetWeekdaysInRange` | Trading-day count |
-| `IsLeapYear` | February calendar check |
-| `New(t).Quarter()` | Quarter number label |
+| API                           | Purpose                       |
+| ----------------------------- | ----------------------------- |
+| `New(t).BeginningOfQuarter()` | Calendar Q1–Q4 start          |
+| `New(t).EndOfQuarter()`       | Calendar Q1–Q4 end            |
+| `New(t).BeginningOfYear()`    | YTD start                     |
+| `New(t).EndOfYear()`          | Year-end boundary             |
+| `New(t).BeginningOfHalf()`    | H1/H2 start                   |
+| `AddDay(t, 45)`               | 10-Q filing deadline          |
+| `AddDay(t, 60)`               | 10-K filing deadline          |
+| `New(t).DurationInDays`       | Days-until-deadline countdown |
+| `GetWeekdaysInRange`          | Trading-day count             |
+| `IsLeapYear`                  | February calendar check       |
+| `New(t).Quarter()`            | Quarter number label          |
 
 ```bash
 cd examples/reporting && go run main.go
@@ -2002,19 +2006,19 @@ are not duplicated within a configurable time window.
 
 **Key timefy APIs used:**
 
-| API | Purpose |
-|-----|---------|
-| `New(t).BeginningOfMonth()` | Monthly job anchor |
-| `New(t).BeginningOfQuarter()` | Quarterly job anchor |
-| `New(t).IsWeekday()` | Skip weekends |
-| `AddDay(t, 1)` | Forward-step day cursor |
-| `AddHour(t, 1)` | Business-hour SLA tick |
-| `AddMinute(t, -n)` | Anti-duplication window start |
-| `New(t).IsBetween` | Duplicate-run detection |
-| `GetWeekdaysInRange` | Week overview rendering |
-| `New(t).Quarter()` | Quarter label on schedule output |
-| `New(t).BeginningOfWeek()` / `EndOfWeek()` | Week schedule bounds |
-| `New(t).TimeAgo()` / `TimeUntil()` | Last-ran / next-run display |
+| API                                        | Purpose                          |
+| ------------------------------------------ | -------------------------------- |
+| `New(t).BeginningOfMonth()`                | Monthly job anchor               |
+| `New(t).BeginningOfQuarter()`              | Quarterly job anchor             |
+| `New(t).IsWeekday()`                       | Skip weekends                    |
+| `AddDay(t, 1)`                             | Forward-step day cursor          |
+| `AddHour(t, 1)`                            | Business-hour SLA tick           |
+| `AddMinute(t, -n)`                         | Anti-duplication window start    |
+| `New(t).IsBetween`                         | Duplicate-run detection          |
+| `GetWeekdaysInRange`                       | Week overview rendering          |
+| `New(t).Quarter()`                         | Quarter label on schedule output |
+| `New(t).BeginningOfWeek()` / `EndOfWeek()` | Week schedule bounds             |
+| `New(t).TimeAgo()` / `TimeUntil()`         | Last-ran / next-run display      |
 
 ```bash
 cd examples/scheduler && go run main.go
@@ -2026,136 +2030,136 @@ cd examples/scheduler && go run main.go
 
 ### Package-level functions
 
-| Function | Returns | Description |
-|----------|---------|-------------|
-| `With(t)` | `*Timex` | Wrap time.Time in Timex |
-| `New(t)` | `*Timex` | Alias for With |
-| `BeginningOfMinute()` | `time.Time` | Start of current minute |
-| `BeginningOfHour()` | `time.Time` | Start of current hour |
-| `BeginningOfDay()` | `time.Time` | Midnight today |
-| `BeginningOfWeek()` | `time.Time` | Start of current week |
-| `BeginningOfMonth()` | `time.Time` | 1st of current month |
-| `BeginningOfQuarter()` | `time.Time` | 1st of current quarter |
-| `BeginningOfYear()` | `time.Time` | Jan 1 of current year |
-| `EndOfMinute()` | `time.Time` | 59.999999999s of current minute |
-| `EndOfHour()` | `time.Time` | 59:59.999999999 of current hour |
-| `EndOfDay()` | `time.Time` | 23:59:59.999999999 today |
-| `EndOfWeek()` | `time.Time` | Last ns of current week |
-| `EndOfMonth()` | `time.Time` | Last ns of current month |
-| `EndOfQuarter()` | `time.Time` | Last ns of current quarter |
-| `EndOfYear()` | `time.Time` | Dec 31 23:59:59.999999999 |
-| `BeginOfDay(t)` | `time.Time` | Midnight of date t |
-| `FEndOfDay(t)` | `time.Time` | 23:59:59 of date t |
-| `PrevBeginOfDay(t, n)` | `time.Time` | Midnight n days before t |
-| `PrevEndOfDay(t, n)` | `time.Time` | 23:59:59 n days before t |
-| `AddSecond(t, n)` | `time.Time` | t ± n seconds |
-| `AddMinute(t, n)` | `time.Time` | t ± n minutes |
-| `AddHour(t, n)` | `time.Time` | t ± n hours |
-| `AddDay(t, n)` | `time.Time` | t ± n×24h |
-| `Monday(s...)` | `time.Time` | Most recent Monday |
-| `Tuesday(s...)` | `time.Time` | Most recent Tuesday |
-| `Wednesday(s...)` | `time.Time` | Most recent Wednesday |
-| `Thursday(s...)` | `time.Time` | Most recent Thursday |
-| `Friday(s...)` | `time.Time` | Most recent Friday |
-| `Saturday(s...)` | `time.Time` | Most recent Saturday |
-| `Sunday(s...)` | `time.Time` | Upcoming Sunday |
-| `EndOfSunday()` | `time.Time` | End of upcoming Sunday |
-| `Quarter()` | `uint` | Quarter of today (1–4) |
-| `Parse(s...)` | `(time.Time, error)` | Parse string(s) |
-| `MustParse(s...)` | `time.Time` | Parse or panic |
-| `ParseInLocation(loc, s...)` | `(time.Time, error)` | Parse in timezone |
-| `MustParseInLocation(loc, s...)` | `time.Time` | Parse in timezone or panic |
-| `Between(t1, t2)` | `bool` | Is now between t1 and t2? |
-| `FormatRFC(layout)` | `string` | Format now with layout |
-| `FormatRFCshort(layout)` | `string` | Format now with short layout |
-| `FFormatRFC(t, layout)` | `string` | Format t with layout |
-| `FFormatRFCshort(t, layout)` | `string` | Format t with short layout |
-| `DefaultFormatRFC()` | `string` | Format now (microseconds) |
-| `FDefaultFormatRFC(t)` | `string` | Format t (microseconds) |
-| `SetTimezone(t, tz)` | `(time.Time, error)` | Convert to timezone |
-| `AdjustTimezone(t, tz)` | `time.Time` | Convert; fallback on error |
-| `IsLeapYear(year)` | `bool` | Is year a leap year? |
-| `IsLeapYearN(t)` | `bool` | Is t.Year() a leap year? |
-| `IsWithinTolerance(t)` | `bool` | Is t within ±1 minute of now? |
-| `SinceHour(t)` | `float64` | Hours since t |
-| `SinceMinute(t)` | `float64` | Minutes since t |
-| `SinceSecond(t)` | `float64` | Seconds since t |
-| `GetWeekdaysInRange(s, e)` | `[]time.Time` | Mon–Fri dates in [s,e] |
-| `FormatTimex(t)` | `[]int` | [ns, sec, min, hr, day, mo, yr] |
-| `NewRule()` | `*Rule` | New config with defaults |
+| Function                         | Returns              | Description                     |
+| -------------------------------- | -------------------- | ------------------------------- |
+| `With(t)`                        | `*Timex`             | Wrap time.Time in Timex         |
+| `New(t)`                         | `*Timex`             | Alias for With                  |
+| `BeginningOfMinute()`            | `time.Time`          | Start of current minute         |
+| `BeginningOfHour()`              | `time.Time`          | Start of current hour           |
+| `BeginningOfDay()`               | `time.Time`          | Midnight today                  |
+| `BeginningOfWeek()`              | `time.Time`          | Start of current week           |
+| `BeginningOfMonth()`             | `time.Time`          | 1st of current month            |
+| `BeginningOfQuarter()`           | `time.Time`          | 1st of current quarter          |
+| `BeginningOfYear()`              | `time.Time`          | Jan 1 of current year           |
+| `EndOfMinute()`                  | `time.Time`          | 59.999999999s of current minute |
+| `EndOfHour()`                    | `time.Time`          | 59:59.999999999 of current hour |
+| `EndOfDay()`                     | `time.Time`          | 23:59:59.999999999 today        |
+| `EndOfWeek()`                    | `time.Time`          | Last ns of current week         |
+| `EndOfMonth()`                   | `time.Time`          | Last ns of current month        |
+| `EndOfQuarter()`                 | `time.Time`          | Last ns of current quarter      |
+| `EndOfYear()`                    | `time.Time`          | Dec 31 23:59:59.999999999       |
+| `BeginOfDay(t)`                  | `time.Time`          | Midnight of date t              |
+| `FEndOfDay(t)`                   | `time.Time`          | 23:59:59 of date t              |
+| `PrevBeginOfDay(t, n)`           | `time.Time`          | Midnight n days before t        |
+| `PrevEndOfDay(t, n)`             | `time.Time`          | 23:59:59 n days before t        |
+| `AddSecond(t, n)`                | `time.Time`          | t ± n seconds                   |
+| `AddMinute(t, n)`                | `time.Time`          | t ± n minutes                   |
+| `AddHour(t, n)`                  | `time.Time`          | t ± n hours                     |
+| `AddDay(t, n)`                   | `time.Time`          | t ± n×24h                       |
+| `Monday(s...)`                   | `time.Time`          | Most recent Monday              |
+| `Tuesday(s...)`                  | `time.Time`          | Most recent Tuesday             |
+| `Wednesday(s...)`                | `time.Time`          | Most recent Wednesday           |
+| `Thursday(s...)`                 | `time.Time`          | Most recent Thursday            |
+| `Friday(s...)`                   | `time.Time`          | Most recent Friday              |
+| `Saturday(s...)`                 | `time.Time`          | Most recent Saturday            |
+| `Sunday(s...)`                   | `time.Time`          | Upcoming Sunday                 |
+| `EndOfSunday()`                  | `time.Time`          | End of upcoming Sunday          |
+| `Quarter()`                      | `uint`               | Quarter of today (1–4)          |
+| `Parse(s...)`                    | `(time.Time, error)` | Parse string(s)                 |
+| `MustParse(s...)`                | `time.Time`          | Parse or panic                  |
+| `ParseInLocation(loc, s...)`     | `(time.Time, error)` | Parse in timezone               |
+| `MustParseInLocation(loc, s...)` | `time.Time`          | Parse in timezone or panic      |
+| `Between(t1, t2)`                | `bool`               | Is now between t1 and t2?       |
+| `FormatRFC(layout)`              | `string`             | Format now with layout          |
+| `FormatRFCshort(layout)`         | `string`             | Format now with short layout    |
+| `FFormatRFC(t, layout)`          | `string`             | Format t with layout            |
+| `FFormatRFCshort(t, layout)`     | `string`             | Format t with short layout      |
+| `DefaultFormatRFC()`             | `string`             | Format now (microseconds)       |
+| `FDefaultFormatRFC(t)`           | `string`             | Format t (microseconds)         |
+| `SetTimezone(t, tz)`             | `(time.Time, error)` | Convert to timezone             |
+| `AdjustTimezone(t, tz)`          | `time.Time`          | Convert; fallback on error      |
+| `IsLeapYear(year)`               | `bool`               | Is year a leap year?            |
+| `IsLeapYearN(t)`                 | `bool`               | Is t.Year() a leap year?        |
+| `IsWithinTolerance(t)`           | `bool`               | Is t within ±1 minute of now?   |
+| `SinceHour(t)`                   | `float64`            | Hours since t                   |
+| `SinceMinute(t)`                 | `float64`            | Minutes since t                 |
+| `SinceSecond(t)`                 | `float64`            | Seconds since t                 |
+| `GetWeekdaysInRange(s, e)`       | `[]time.Time`        | Mon–Fri dates in [s,e]          |
+| `FormatTimex(t)`                 | `[]int`              | [ns, sec, min, hr, day, mo, yr] |
+| `NewRule()`                      | `*Rule`              | New config with defaults        |
 
 ### Timex methods
 
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `.BeginningOfMinute()` | `time.Time` | Start of minute |
-| `.BeginningOfHour()` | `time.Time` | Start of hour |
-| `.BeginningOfDay()` | `time.Time` | Midnight |
-| `.BeginningOfWeek()` | `time.Time` | Start of week (per weekStartDay) |
-| `.BeginningOfMonth()` | `time.Time` | 1st of month |
-| `.BeginningOfQuarter()` | `time.Time` | 1st of quarter |
-| `.BeginningOfHalf()` | `time.Time` | 1st of half-year |
-| `.BeginningOfYear()` | `time.Time` | Jan 1st |
-| `.EndOfMinute()` | `time.Time` | Last ns of minute |
-| `.EndOfHour()` | `time.Time` | Last ns of hour |
-| `.EndOfDay()` | `time.Time` | Last ns of day |
-| `.EndOfWeek()` | `time.Time` | Last ns of week |
-| `.EndOfMonth()` | `time.Time` | Last ns of month |
-| `.EndOfQuarter()` | `time.Time` | Last ns of quarter |
-| `.EndOfHalf()` | `time.Time` | Last ns of half-year |
-| `.EndOfYear()` | `time.Time` | Last ns of year |
-| `.Monday(s...)` | `time.Time` | Most recent Monday |
-| `.Tuesday(s...)` | `time.Time` | Most recent Tuesday |
-| `.Wednesday(s...)` | `time.Time` | Most recent Wednesday |
-| `.Thursday(s...)` | `time.Time` | Most recent Thursday |
-| `.Friday(s...)` | `time.Time` | Most recent Friday |
-| `.Saturday(s...)` | `time.Time` | Most recent Saturday |
-| `.Sunday(s...)` | `time.Time` | Upcoming Sunday |
-| `.EndOfSunday()` | `time.Time` | End of upcoming Sunday |
-| `.Quarter()` | `uint` | Quarter (1–4) |
-| `.Parse(s...)` | `(time.Time, error)` | Parse with rule context |
-| `.MustParse(s...)` | `time.Time` | Parse or panic |
-| `.Between(begin, end)` | `bool` | Is tx.Time between begin/end? |
-| `.FormatRFC(layout)` | `string` | Format with full layout |
-| `.FormatRFCshort(layout)` | `string` | Format with short layout |
-| `.DefaultFormatRFC()` | `string` | Format (microseconds) |
-| `.TimeAgo()` | `string` | Human-readable past time |
-| `.TimeUntil()` | `string` | Human-readable future time |
-| `.DurationInDays(other)` | `int` | Days between tx and other |
-| `.DurationInWeeks(other)` | `int` | Weeks between tx and other |
-| `.DurationInMonths(other)` | `int` | Months between tx and other |
-| `.DurationInYears(other)` | `int` | Years between tx and other |
-| `.IsWeekend()` | `bool` | Sat or Sun? |
-| `.IsWeekday()` | `bool` | Mon–Fri? |
-| `.IsBefore(other)` | `bool` | tx < other? |
-| `.IsAfter(other)` | `bool` | tx > other? |
-| `.IsBetween(start, end)` | `bool` | start ≤ tx ≤ end? |
-| `.IsSameDay(other)` | `bool` | Same calendar day? |
-| `.IsSameMonth(other)` | `bool` | Same year-month? |
-| `.IsSameYear(other)` | `bool` | Same year? |
-| `.IsToday()` | `bool` | tx.Date == today? |
-| `.IsYesterday()` | `bool` | tx.Date == yesterday? |
-| `.IsTomorrow()` | `bool` | tx.Date == tomorrow? |
-| `.IsPast()` | `bool` | tx < now? |
-| `.IsFuture()` | `bool` | tx > now? |
+| Method                     | Returns              | Description                      |
+| -------------------------- | -------------------- | -------------------------------- |
+| `.BeginningOfMinute()`     | `time.Time`          | Start of minute                  |
+| `.BeginningOfHour()`       | `time.Time`          | Start of hour                    |
+| `.BeginningOfDay()`        | `time.Time`          | Midnight                         |
+| `.BeginningOfWeek()`       | `time.Time`          | Start of week (per weekStartDay) |
+| `.BeginningOfMonth()`      | `time.Time`          | 1st of month                     |
+| `.BeginningOfQuarter()`    | `time.Time`          | 1st of quarter                   |
+| `.BeginningOfHalf()`       | `time.Time`          | 1st of half-year                 |
+| `.BeginningOfYear()`       | `time.Time`          | Jan 1st                          |
+| `.EndOfMinute()`           | `time.Time`          | Last ns of minute                |
+| `.EndOfHour()`             | `time.Time`          | Last ns of hour                  |
+| `.EndOfDay()`              | `time.Time`          | Last ns of day                   |
+| `.EndOfWeek()`             | `time.Time`          | Last ns of week                  |
+| `.EndOfMonth()`            | `time.Time`          | Last ns of month                 |
+| `.EndOfQuarter()`          | `time.Time`          | Last ns of quarter               |
+| `.EndOfHalf()`             | `time.Time`          | Last ns of half-year             |
+| `.EndOfYear()`             | `time.Time`          | Last ns of year                  |
+| `.Monday(s...)`            | `time.Time`          | Most recent Monday               |
+| `.Tuesday(s...)`           | `time.Time`          | Most recent Tuesday              |
+| `.Wednesday(s...)`         | `time.Time`          | Most recent Wednesday            |
+| `.Thursday(s...)`          | `time.Time`          | Most recent Thursday             |
+| `.Friday(s...)`            | `time.Time`          | Most recent Friday               |
+| `.Saturday(s...)`          | `time.Time`          | Most recent Saturday             |
+| `.Sunday(s...)`            | `time.Time`          | Upcoming Sunday                  |
+| `.EndOfSunday()`           | `time.Time`          | End of upcoming Sunday           |
+| `.Quarter()`               | `uint`               | Quarter (1–4)                    |
+| `.Parse(s...)`             | `(time.Time, error)` | Parse with rule context          |
+| `.MustParse(s...)`         | `time.Time`          | Parse or panic                   |
+| `.Between(begin, end)`     | `bool`               | Is tx.Time between begin/end?    |
+| `.FormatRFC(layout)`       | `string`             | Format with full layout          |
+| `.FormatRFCshort(layout)`  | `string`             | Format with short layout         |
+| `.DefaultFormatRFC()`      | `string`             | Format (microseconds)            |
+| `.TimeAgo()`               | `string`             | Human-readable past time         |
+| `.TimeUntil()`             | `string`             | Human-readable future time       |
+| `.DurationInDays(other)`   | `int`                | Days between tx and other        |
+| `.DurationInWeeks(other)`  | `int`                | Weeks between tx and other       |
+| `.DurationInMonths(other)` | `int`                | Months between tx and other      |
+| `.DurationInYears(other)`  | `int`                | Years between tx and other       |
+| `.IsWeekend()`             | `bool`               | Sat or Sun?                      |
+| `.IsWeekday()`             | `bool`               | Mon–Fri?                         |
+| `.IsBefore(other)`         | `bool`               | tx < other?                      |
+| `.IsAfter(other)`          | `bool`               | tx > other?                      |
+| `.IsBetween(start, end)`   | `bool`               | start ≤ tx ≤ end?                |
+| `.IsSameDay(other)`        | `bool`               | Same calendar day?               |
+| `.IsSameMonth(other)`      | `bool`               | Same year-month?                 |
+| `.IsSameYear(other)`       | `bool`               | Same year?                       |
+| `.IsToday()`               | `bool`               | tx.Date == today?                |
+| `.IsYesterday()`           | `bool`               | tx.Date == yesterday?            |
+| `.IsTomorrow()`            | `bool`               | tx.Date == tomorrow?             |
+| `.IsPast()`                | `bool`               | tx < now?                        |
+| `.IsFuture()`              | `bool`               | tx > now?                        |
 
 ### Rule methods
 
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `NewRule()` | `*Rule` | Default config |
-| `.WithWeekStartDay(d)` | `*Rule` | Set week-start day |
-| `.WithTimeFormats(fs)` | `*Rule` | Replace format list |
-| `.WithLocation(loc)` | `*Rule` | Set *time.Location |
-| `.WithLocationRFC(z)` | `*Rule` | Set timezone by ZoneRFC |
-| `.ApplyUTCLoc()` | `*Rule` | Set UTC |
-| `.ApplyLocalLoc()` | `*Rule` | Set local |
-| `.AppendTimeFormat(s...)` | `*Rule` | Append string formats |
-| `.AppendTimeFormatRFC(f...)` | `*Rule` | Append TimeFormatRFC |
-| `.AppendTimeFormatRFCshort(f...)` | `*Rule` | Append TimeRFC |
-| `.With(t)` | `*Timex` | Create Timex with this rule |
-| `.Parse(s...)` | `(time.Time, error)` | Parse with this rule |
-| `.MustParse(s...)` | `time.Time` | Parse or panic |
+| Method                            | Returns              | Description                 |
+| --------------------------------- | -------------------- | --------------------------- |
+| `NewRule()`                       | `*Rule`              | Default config              |
+| `.WithWeekStartDay(d)`            | `*Rule`              | Set week-start day          |
+| `.WithTimeFormats(fs)`            | `*Rule`              | Replace format list         |
+| `.WithLocation(loc)`              | `*Rule`              | Set \*time.Location         |
+| `.WithLocationRFC(z)`             | `*Rule`              | Set timezone by ZoneRFC     |
+| `.ApplyUTCLoc()`                  | `*Rule`              | Set UTC                     |
+| `.ApplyLocalLoc()`                | `*Rule`              | Set local                   |
+| `.AppendTimeFormat(s...)`         | `*Rule`              | Append string formats       |
+| `.AppendTimeFormatRFC(f...)`      | `*Rule`              | Append TimeFormatRFC        |
+| `.AppendTimeFormatRFCshort(f...)` | `*Rule`              | Append TimeRFC              |
+| `.With(t)`                        | `*Timex`             | Create Timex with this rule |
+| `.Parse(s...)`                    | `(time.Time, error)` | Parse with this rule        |
+| `.MustParse(s...)`                | `time.Time`          | Parse or panic              |
 
 ---
 
@@ -2163,72 +2167,72 @@ cd examples/scheduler && go run main.go
 
 ### Short formats (TimeRFC)
 
-| Constant | Pattern | Example |
-|----------|---------|---------|
+| Constant           | Pattern    | Example    |
+| ------------------ | ---------- | ---------- |
 | `TimeRFC01T150405` | `15:04:05` | `13:45:30` |
 | `TimeRFC02D150405` | `15.04.05` | `13.45.30` |
 | `TimeRFC03H150405` | `15-04-05` | `13-45-30` |
 | `TimeRFC04M150405` | `15/04/05` | `13/45/30` |
 | `TimeRFC05S150405` | `15 04 05` | `13 45 30` |
-| `TimeRFC06T150405` | `150405` | `134530` |
-| `TimeRFC07D150405` | `15:04` | `13:45` |
-| `TimeRFC08H150405` | `15.04` | `13.45` |
-| `TimeRFC09M150405` | `15-04` | `13-45` |
-| `TimeRFC10S150405` | `15/04` | `13/45` |
-| `TimeRFC11T150405` | `1504` | `1345` |
+| `TimeRFC06T150405` | `150405`   | `134530`   |
+| `TimeRFC07D150405` | `15:04`    | `13:45`    |
+| `TimeRFC08H150405` | `15.04`    | `13.45`    |
+| `TimeRFC09M150405` | `15-04`    | `13-45`    |
+| `TimeRFC10S150405` | `15/04`    | `13/45`    |
+| `TimeRFC11T150405` | `1504`     | `1345`     |
 
 ### Full formats (TimeFormatRFC) — selected
 
-| Constant | Pattern | Example |
-|----------|---------|---------|
-| `TimeFormat20060102T150405999999` | `2006-01-02T15:04:05.999999` | `2023-08-15T13:45:30.123456` |
-| `TimeFormat20060102T150405` | `2006-01-02T15:04:05` | `2023-08-15T13:45:30` |
-| `TimeFormat20060102150405` | `2006-01-02 15:04:05` | `2023-08-15 13:45:30` |
-| `TimeFormat20060102150405999999` | `2006-01-02 15:04:05.999999` | `2023-08-15 13:45:30.123456` |
-| `TimeFormat20060102` | `2006-01-02` | `2023-08-15` |
-| `TimeFormat200601` | `2006-01` | `2023-08` |
-| `TimeFormat20060102150405Z0700` | `2006-01-02 15:04:05 -07:00` | `2023-08-15 13:45:30 -05:00` |
-| `TimeFormat20060102150405Z0700RFC3339` | `2006-01-02T15:04:05-07:00` | `2023-08-15T13:45:30-05:00` |
+| Constant                               | Pattern                      | Example                      |
+| -------------------------------------- | ---------------------------- | ---------------------------- |
+| `TimeFormat20060102T150405999999`      | `2006-01-02T15:04:05.999999` | `2023-08-15T13:45:30.123456` |
+| `TimeFormat20060102T150405`            | `2006-01-02T15:04:05`        | `2023-08-15T13:45:30`        |
+| `TimeFormat20060102150405`             | `2006-01-02 15:04:05`        | `2023-08-15 13:45:30`        |
+| `TimeFormat20060102150405999999`       | `2006-01-02 15:04:05.999999` | `2023-08-15 13:45:30.123456` |
+| `TimeFormat20060102`                   | `2006-01-02`                 | `2023-08-15`                 |
+| `TimeFormat200601`                     | `2006-01`                    | `2023-08`                    |
+| `TimeFormat20060102150405Z0700`        | `2006-01-02 15:04:05 -07:00` | `2023-08-15 13:45:30 -05:00` |
+| `TimeFormat20060102150405Z0700RFC3339` | `2006-01-02T15:04:05-07:00`  | `2023-08-15T13:45:30-05:00`  |
 
 ---
 
 ## 27. Timezone Constant Reference
 
-| Constant | IANA Name | UTC Offset (standard) |
-|----------|-----------|----------------------|
-| `DefaultTimezoneVietnam` | `Asia/Ho_Chi_Minh` | +07:00 |
-| `DefaultTimezoneNewYork` | `America/New_York` | -05:00 / -04:00 (DST) |
-| `DefaultTimezoneLondon` | `Europe/London` | +00:00 / +01:00 (BST) |
-| `DefaultTimezoneTokyo` | `Asia/Tokyo` | +09:00 |
-| `DefaultTimezoneSydney` | `Australia/Sydney` | +10:00 / +11:00 (AEDT) |
-| `DefaultTimezoneParis` | `Europe/Paris` | +01:00 / +02:00 (CEST) |
-| `DefaultTimezoneMoscow` | `Europe/Moscow` | +03:00 |
-| `DefaultTimezoneLosAngeles` | `America/Los_Angeles` | -08:00 / -07:00 (PDT) |
-| `DefaultTimezoneManila` | `Asia/Manila` | +08:00 |
-| `DefaultTimezoneKualaLumpur` | `Asia/Kuala_Lumpur` | +08:00 |
-| `DefaultTimezoneJakarta` | `Asia/Jakarta` | +07:00 |
-| `DefaultTimezoneYangon` | `Asia/Yangon` | +06:30 |
-| `DefaultTimezoneAuckland` | `Pacific/Auckland` | +12:00 / +13:00 (NZDT) |
-| `DefaultTimezoneBangkok` | `Asia/Bangkok` | +07:00 |
-| `DefaultTimezoneDelhi` | `Asia/Kolkata` | +05:30 |
-| `DefaultTimezoneDubai` | `Asia/Dubai` | +04:00 |
-| `DefaultTimezoneCairo` | `Africa/Cairo` | +02:00 |
-| `DefaultTimezoneAthens` | `Europe/Athens` | +02:00 / +03:00 (EEST) |
-| `DefaultTimezoneRome` | `Europe/Rome` | +01:00 / +02:00 (CEST) |
-| `DefaultTimezoneJohannesburg` | `Africa/Johannesburg` | +02:00 |
-| `DefaultTimezoneStockholm` | `Europe/Stockholm` | +01:00 / +02:00 (CEST) |
-| `DefaultTimezoneOslo` | `Europe/Oslo` | +01:00 / +02:00 (CEST) |
-| `DefaultTimezoneHelsinki` | `Europe/Helsinki` | +02:00 / +03:00 (EEST) |
-| `DefaultTimezoneKiev` | `Europe/Kiev` | +02:00 / +03:00 (EEST) |
-| `DefaultTimezoneBeijing` | `Asia/Shanghai` | +08:00 |
-| `DefaultTimezoneSingapore` | `Asia/Singapore` | +08:00 |
-| `DefaultTimezoneIslamabad` | `Asia/Karachi` | +05:00 |
-| `DefaultTimezoneColombo` | `Asia/Colombo` | +05:30 |
-| `DefaultTimezoneDhaka` | `Asia/Dhaka` | +06:00 |
-| `DefaultTimezoneKathmandu` | `Asia/Kathmandu` | +05:45 |
-| `DefaultTimezoneBrisbane` | `Australia/Brisbane` | +10:00 |
-| `DefaultTimezoneWellington` | `Pacific/Auckland` | +12:00 / +13:00 (NZDT) |
-| `DefaultTimezonePortMoresby` | `Pacific/Port_Moresby` | +10:00 |
-| `DefaultTimezoneSuva` | `Pacific/Fiji` | +12:00 |
+| Constant                      | IANA Name              | UTC Offset (standard)  |
+| ----------------------------- | ---------------------- | ---------------------- |
+| `DefaultTimezoneVietnam`      | `Asia/Ho_Chi_Minh`     | +07:00                 |
+| `DefaultTimezoneNewYork`      | `America/New_York`     | -05:00 / -04:00 (DST)  |
+| `DefaultTimezoneLondon`       | `Europe/London`        | +00:00 / +01:00 (BST)  |
+| `DefaultTimezoneTokyo`        | `Asia/Tokyo`           | +09:00                 |
+| `DefaultTimezoneSydney`       | `Australia/Sydney`     | +10:00 / +11:00 (AEDT) |
+| `DefaultTimezoneParis`        | `Europe/Paris`         | +01:00 / +02:00 (CEST) |
+| `DefaultTimezoneMoscow`       | `Europe/Moscow`        | +03:00                 |
+| `DefaultTimezoneLosAngeles`   | `America/Los_Angeles`  | -08:00 / -07:00 (PDT)  |
+| `DefaultTimezoneManila`       | `Asia/Manila`          | +08:00                 |
+| `DefaultTimezoneKualaLumpur`  | `Asia/Kuala_Lumpur`    | +08:00                 |
+| `DefaultTimezoneJakarta`      | `Asia/Jakarta`         | +07:00                 |
+| `DefaultTimezoneYangon`       | `Asia/Yangon`          | +06:30                 |
+| `DefaultTimezoneAuckland`     | `Pacific/Auckland`     | +12:00 / +13:00 (NZDT) |
+| `DefaultTimezoneBangkok`      | `Asia/Bangkok`         | +07:00                 |
+| `DefaultTimezoneDelhi`        | `Asia/Kolkata`         | +05:30                 |
+| `DefaultTimezoneDubai`        | `Asia/Dubai`           | +04:00                 |
+| `DefaultTimezoneCairo`        | `Africa/Cairo`         | +02:00                 |
+| `DefaultTimezoneAthens`       | `Europe/Athens`        | +02:00 / +03:00 (EEST) |
+| `DefaultTimezoneRome`         | `Europe/Rome`          | +01:00 / +02:00 (CEST) |
+| `DefaultTimezoneJohannesburg` | `Africa/Johannesburg`  | +02:00                 |
+| `DefaultTimezoneStockholm`    | `Europe/Stockholm`     | +01:00 / +02:00 (CEST) |
+| `DefaultTimezoneOslo`         | `Europe/Oslo`          | +01:00 / +02:00 (CEST) |
+| `DefaultTimezoneHelsinki`     | `Europe/Helsinki`      | +02:00 / +03:00 (EEST) |
+| `DefaultTimezoneKiev`         | `Europe/Kiev`          | +02:00 / +03:00 (EEST) |
+| `DefaultTimezoneBeijing`      | `Asia/Shanghai`        | +08:00                 |
+| `DefaultTimezoneSingapore`    | `Asia/Singapore`       | +08:00                 |
+| `DefaultTimezoneIslamabad`    | `Asia/Karachi`         | +05:00                 |
+| `DefaultTimezoneColombo`      | `Asia/Colombo`         | +05:30                 |
+| `DefaultTimezoneDhaka`        | `Asia/Dhaka`           | +06:00                 |
+| `DefaultTimezoneKathmandu`    | `Asia/Kathmandu`       | +05:45                 |
+| `DefaultTimezoneBrisbane`     | `Australia/Brisbane`   | +10:00                 |
+| `DefaultTimezoneWellington`   | `Pacific/Auckland`     | +12:00 / +13:00 (NZDT) |
+| `DefaultTimezonePortMoresby`  | `Pacific/Port_Moresby` | +10:00                 |
+| `DefaultTimezoneSuva`         | `Pacific/Fiji`         | +12:00                 |
 
 ---

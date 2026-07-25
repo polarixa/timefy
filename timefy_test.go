@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sivaosorg/timefy"
+	"github.com/polarixa/timefy"
 )
 
 func TestWith(t *testing.T) {

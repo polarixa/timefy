@@ -15,7 +15,7 @@ import (
 	"math"
 	"time"
 
-	"github.com/sivaosorg/timefy"
+	"github.com/polarixa/timefy"
 )
 
 // Subscription holds all metadata for a single tenant's billing record.

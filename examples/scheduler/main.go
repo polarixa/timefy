@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sivaosorg/timefy"
+	"github.com/polarixa/timefy"
 )
 
 // Schedule describes a recurring job's timing rules.

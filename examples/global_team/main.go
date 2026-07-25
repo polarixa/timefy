@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sivaosorg/timefy"
+	"github.com/polarixa/timefy"
 )
 
 // Office describes a single regional office.

@@ -1,7 +1,9 @@
 package timefy
 
 import (
+	"errors"
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -180,7 +182,9 @@ func (c *Rule) MustParse(s ...string) time.Time {
 //	t := Timex{Time: time.Now()}
 //	startOfMinute := t.BeginningOfMinute() // This will return the current time truncated to the start of the minute.
 func (t *Timex) BeginningOfMinute() time.Time {
-	return t.Truncate(time.Minute)
+	_, _, sec := t.Time.Clock()
+	// Subtract the wall-clock seconds and nanoseconds; Round(0) strips the monotonic reading.
+	return t.Time.Add(-(time.Duration(sec)*time.Second + time.Duration(t.Time.Nanosecond()))).Round(0)
 }
 
 // BeginningOfHour returns a new time.Time value representing the start of the hour for the
@@ -199,8 +203,11 @@ func (t *Timex) BeginningOfMinute() time.Time {
 //	t := Timex{Time: time.Now()}
 //	startOfHour := t.BeginningOfHour() // This will return the current time truncated to the start of the hour.
 func (t *Timex) BeginningOfHour() time.Time {
-	y, m, d := t.Date()
-	return time.Date(y, m, d, t.Time.Hour(), 0, 0, 0, t.Time.Location())
+	_, min, sec := t.Time.Clock()
+	// Work on the instant rather than rebuilding it with time.Date, which would always pick the
+	// first occurrence of an ambiguous hour (DST fall-back). Round(0) strips the monotonic reading.
+	off := time.Duration(min)*time.Minute + time.Duration(sec)*time.Second + time.Duration(t.Time.Nanosecond())
+	return t.Time.Add(-off).Round(0)
 }
 
 // BeginningOfDay returns a new time.Time value representing the start of the day for the
@@ -487,19 +494,19 @@ func (t *Timex) EndOfYear() time.Time {
 	return t.BeginningOfYear().AddDate(1, 0, 0).Add(-time.Nanosecond)
 }
 
-// Monday returns a new time.Time value representing the most recent Monday at the start of the week
-// based on the provided date string(s) or the current date if no date strings are provided.
+// Monday returns a new time.Time value representing Monday of the Monday-to-Sunday week that
+// contains the date given by the provided date string(s), or the current date if none are provided.
 //
 // If a date string is provided, it parses the date using the Timex `Parse` method. If no string is provided,
 // the function defaults to the start of the current day. It then determines the weekday of the parsed date.
 // If the weekday is Sunday (represented by 0), it adjusts to be the seventh day for calculation purposes.
-// The function finally subtracts the necessary days to reach the last Monday.
+// The function finally moves to Monday of that Monday-to-Sunday week (which may be after the reference day).
 //
 // Parameters:
 //   - s ...string: Optional date string(s) to parse; if none are provided, it defaults to today.
 //
 // Returns:
-//   - A `time.Time` value representing the date and time at the start of the last Monday.
+//   - A `time.Time` value representing the date and time at the Monday of that week, keeping the time of day.
 //
 // Example:
 //
@@ -527,19 +534,19 @@ func (t *Timex) Monday(s ...string) time.Time {
 	return parseTime.AddDate(0, 0, -weekday+1)
 }
 
-// Tuesday returns a new time.Time value representing the most recent Tuesday at the start of the week
-// based on the provided date string(s) or the current date if no date strings are provided.
+// Tuesday returns a new time.Time value representing Tuesday of the Monday-to-Sunday week that
+// contains the date given by the provided date string(s), or the current date if none are provided.
 //
 // If a date string is provided, it parses the date using the Timex `Parse` method. If no string is provided,
 // the function defaults to the start of the current day. It then determines the weekday of the parsed date.
 // If the weekday is Sunday (represented by 0), it adjusts to be the seventh day for calculation purposes.
-// The function finally subtracts the necessary days to reach the last Tuesday.
+// The function finally moves to Tuesday of that Monday-to-Sunday week (which may be after the reference day).
 //
 // Parameters:
 //   - s ...string: Optional date string(s) to parse; if none are provided, it defaults to today.
 //
 // Returns:
-//   - A `time.Time` value representing the date and time at the start of the last Tuesday.
+//   - A `time.Time` value representing the date and time at the Tuesday of that week, keeping the time of day.
 //
 // Example:
 //
@@ -567,19 +574,19 @@ func (t *Timex) Tuesday(s ...string) time.Time {
 	return parseTime.AddDate(0, 0, -weekday+2)
 }
 
-// Wednesday returns a new time.Time value representing the most recent Wednesday at the start of the week
-// based on the provided date string(s) or the current date if no date strings are provided.
+// Wednesday returns a new time.Time value representing Wednesday of the Monday-to-Sunday week that
+// contains the date given by the provided date string(s), or the current date if none are provided.
 //
 // If a date string is provided, it parses the date using the Timex `Parse` method. If no string is provided,
 // the function defaults to the start of the current day. It then determines the weekday of the parsed date.
 // If the weekday is Sunday (represented by 0), it adjusts to be the seventh day for calculation purposes.
-// The function finally subtracts the necessary days to reach the last Wednesday.
+// The function finally moves to Wednesday of that Monday-to-Sunday week (which may be after the reference day).
 //
 // Parameters:
 //   - s ...string: Optional date string(s) to parse; if none are provided, it defaults to today.
 //
 // Returns:
-//   - A `time.Time` value representing the date and time at the start of the last Wednesday.
+//   - A `time.Time` value representing the date and time at the Wednesday of that week, keeping the time of day.
 //
 // Example:
 //
@@ -607,19 +614,19 @@ func (t *Timex) Wednesday(s ...string) time.Time {
 	return parseTime.AddDate(0, 0, -weekday+3)
 }
 
-// Thursday returns a new time.Time value representing the most recent Thursday at the start of the week
-// based on the provided date string(s) or the current date if no date strings are provided.
+// Thursday returns a new time.Time value representing Thursday of the Monday-to-Sunday week that
+// contains the date given by the provided date string(s), or the current date if none are provided.
 //
 // If a date string is provided, it parses the date using the Timex `Parse` method. If no string is provided,
 // the function defaults to the start of the current day. It then determines the weekday of the parsed date.
 // If the weekday is Sunday (represented by 0), it adjusts to be the seventh day for calculation purposes.
-// The function finally subtracts the necessary days to reach the last Thursday.
+// The function finally moves to Thursday of that Monday-to-Sunday week (which may be after the reference day).
 //
 // Parameters:
 //   - s ...string: Optional date string(s) to parse; if none are provided, it defaults to today.
 //
 // Returns:
-//   - A `time.Time` value representing the date and time at the start of the last Thursday.
+//   - A `time.Time` value representing the date and time at the Thursday of that week, keeping the time of day.
 //
 // Example:
 //
@@ -647,19 +654,19 @@ func (t *Timex) Thursday(s ...string) time.Time {
 	return parseTime.AddDate(0, 0, -weekday+4)
 }
 
-// Friday returns a new time.Time value representing the most recent Friday at the start of the week
-// based on the provided date string(s) or the current date if no date strings are provided.
+// Friday returns a new time.Time value representing Friday of the Monday-to-Sunday week that
+// contains the date given by the provided date string(s), or the current date if none are provided.
 //
 // If a date string is provided, it parses the date using the Timex `Parse` method. If no string is provided,
 // the function defaults to the start of the current day. It then determines the weekday of the parsed date.
 // If the weekday is Sunday (represented by 0), it adjusts to be the seventh day for calculation purposes.
-// The function finally subtracts the necessary days to reach the last Friday.
+// The function finally moves to Friday of that Monday-to-Sunday week (which may be after the reference day).
 //
 // Parameters:
 //   - s ...string: Optional date string(s) to parse; if none are provided, it defaults to today.
 //
 // Returns:
-//   - A `time.Time` value representing the date and time at the start of the last Friday.
+//   - A `time.Time` value representing the date and time at the Friday of that week, keeping the time of day.
 //
 // Example:
 //
@@ -687,19 +694,19 @@ func (t *Timex) Friday(s ...string) time.Time {
 	return parseTime.AddDate(0, 0, -weekday+5)
 }
 
-// Saturday returns a new time.Time value representing the most recent Saturday at the start of the week
-// based on the provided date string(s) or the current date if no date strings are provided.
+// Saturday returns a new time.Time value representing Saturday of the Monday-to-Sunday week that
+// contains the date given by the provided date string(s), or the current date if none are provided.
 //
 // If a date string is provided, it parses the date using the Timex `Parse` method. If no string is provided,
 // the function defaults to the start of the current day. It then determines the weekday of the parsed date.
 // If the weekday is Sunday (represented by 0), it adjusts to be the seventh day for calculation purposes.
-// The function finally subtracts the necessary days to reach the last Saturday.
+// The function finally moves to Saturday of that Monday-to-Sunday week (which may be after the reference day).
 //
 // Parameters:
 //   - s ...string: Optional date string(s) to parse; if none are provided, it defaults to today.
 //
 // Returns:
-//   - A `time.Time` value representing the date and time at the start of the last Saturday.
+//   - A `time.Time` value representing the date and time at the Saturday of that week, keeping the time of day.
 //
 // Example:
 //
@@ -826,85 +833,85 @@ func (t *Timex) weekdaySafe(dayName string, offset int, s ...string) (time.Time,
 	return parseTime.AddDate(0, 0, -weekday+offset), nil
 }
 
-// MondaySafe returns a new time.Time value representing the most recent Monday at the start of the week
-// based on the provided date string(s) or the current date if no date strings are provided.
+// MondaySafe returns a new time.Time value representing Monday of the Monday-to-Sunday week that
+// contains the date given by the provided date string(s), or the current date if none are provided.
 // Unlike Monday(), this method returns an error instead of panicking on parse failures.
 //
 // Parameters:
 //   - s ...string: Optional date string(s) to parse; if none are provided, it defaults to today.
 //
 // Returns:
-//   - A `time.Time` value representing the date and time at the start of the last Monday.
+//   - A `time.Time` value representing the date and time at the Monday of that week, keeping the time of day.
 //   - An error if parsing fails.
 func (t *Timex) MondaySafe(s ...string) (time.Time, error) {
 	return t.weekdaySafe("Monday", 1, s...)
 }
 
-// TuesdaySafe returns a new time.Time value representing the most recent Tuesday at the start of the week
-// based on the provided date string(s) or the current date if no date strings are provided.
+// TuesdaySafe returns a new time.Time value representing Tuesday of the Monday-to-Sunday week that
+// contains the date given by the provided date string(s), or the current date if none are provided.
 // Unlike Tuesday(), this method returns an error instead of panicking on parse failures.
 //
 // Parameters:
 //   - s ...string: Optional date string(s) to parse; if none are provided, it defaults to today.
 //
 // Returns:
-//   - A `time.Time` value representing the date and time at the start of the last Tuesday.
+//   - A `time.Time` value representing the date and time at the Tuesday of that week, keeping the time of day.
 //   - An error if parsing fails.
 func (t *Timex) TuesdaySafe(s ...string) (time.Time, error) {
 	return t.weekdaySafe("Tuesday", 2, s...)
 }
 
-// WednesdaySafe returns a new time.Time value representing the most recent Wednesday at the start of the week
-// based on the provided date string(s) or the current date if no date strings are provided.
+// WednesdaySafe returns a new time.Time value representing Wednesday of the Monday-to-Sunday week that
+// contains the date given by the provided date string(s), or the current date if none are provided.
 // Unlike Wednesday(), this method returns an error instead of panicking on parse failures.
 //
 // Parameters:
 //   - s ...string: Optional date string(s) to parse; if none are provided, it defaults to today.
 //
 // Returns:
-//   - A `time.Time` value representing the date and time at the start of the last Wednesday.
+//   - A `time.Time` value representing the date and time at the Wednesday of that week, keeping the time of day.
 //   - An error if parsing fails.
 func (t *Timex) WednesdaySafe(s ...string) (time.Time, error) {
 	return t.weekdaySafe("Wednesday", 3, s...)
 }
 
-// ThursdaySafe returns a new time.Time value representing the most recent Thursday at the start of the week
-// based on the provided date string(s) or the current date if no date strings are provided.
+// ThursdaySafe returns a new time.Time value representing Thursday of the Monday-to-Sunday week that
+// contains the date given by the provided date string(s), or the current date if none are provided.
 // Unlike Thursday(), this method returns an error instead of panicking on parse failures.
 //
 // Parameters:
 //   - s ...string: Optional date string(s) to parse; if none are provided, it defaults to today.
 //
 // Returns:
-//   - A `time.Time` value representing the date and time at the start of the last Thursday.
+//   - A `time.Time` value representing the date and time at the Thursday of that week, keeping the time of day.
 //   - An error if parsing fails.
 func (t *Timex) ThursdaySafe(s ...string) (time.Time, error) {
 	return t.weekdaySafe("Thursday", 4, s...)
 }
 
-// FridaySafe returns a new time.Time value representing the most recent Friday at the start of the week
-// based on the provided date string(s) or the current date if no date strings are provided.
+// FridaySafe returns a new time.Time value representing Friday of the Monday-to-Sunday week that
+// contains the date given by the provided date string(s), or the current date if none are provided.
 // Unlike Friday(), this method returns an error instead of panicking on parse failures.
 //
 // Parameters:
 //   - s ...string: Optional date string(s) to parse; if none are provided, it defaults to today.
 //
 // Returns:
-//   - A `time.Time` value representing the date and time at the start of the last Friday.
+//   - A `time.Time` value representing the date and time at the Friday of that week, keeping the time of day.
 //   - An error if parsing fails.
 func (t *Timex) FridaySafe(s ...string) (time.Time, error) {
 	return t.weekdaySafe("Friday", 5, s...)
 }
 
-// SaturdaySafe returns a new time.Time value representing the most recent Saturday at the start of the week
-// based on the provided date string(s) or the current date if no date strings are provided.
+// SaturdaySafe returns a new time.Time value representing Saturday of the Monday-to-Sunday week that
+// contains the date given by the provided date string(s), or the current date if none are provided.
 // Unlike Saturday(), this method returns an error instead of panicking on parse failures.
 //
 // Parameters:
 //   - s ...string: Optional date string(s) to parse; if none are provided, it defaults to today.
 //
 // Returns:
-//   - A `time.Time` value representing the date and time at the start of the last Saturday.
+//   - A `time.Time` value representing the date and time at the Saturday of that week, keeping the time of day.
 //   - An error if parsing fails.
 func (t *Timex) SaturdaySafe(s ...string) (time.Time, error) {
 	return t.weekdaySafe("Saturday", 6, s...)
@@ -914,9 +921,8 @@ func (t *Timex) SaturdaySafe(s ...string) (time.Time, error) {
 // based on the provided date string(s) or the current date if no date strings are provided.
 // Unlike Sunday(), this method returns an error instead of panicking on parse failures.
 //
-// Note: This method uses the same algorithm as the other weekday methods but with an offset
-// calculation that always returns a future Sunday (or today if it's already Sunday at midnight).
-// If the current day is Sunday, it returns the next Sunday (7 days later).
+// Note: Like Sunday(), the result is the Sunday that ends the current Monday-to-Sunday week.
+// If the reference day is already a Sunday, the same day is returned (not the following Sunday).
 //
 // Parameters:
 //   - s ...string: Optional date string(s) to parse; if none are provided, it defaults to today.
@@ -970,52 +976,91 @@ func (t *Timex) SundaySafe(s ...string) (time.Time, error) {
 //	}
 //
 // Note:
-// - The function modifies the parsed date based on the current time when certain components are missing.
-// - It will return the most recent successful parsed value or the zero value of time.Time if none succeed.
+//   - The function modifies the parsed date based on the current time when certain components are missing.
+//   - Strings that fail to parse are skipped. The result is built from the strings that parsed, in order;
+//     if none parse (or no string is given) it returns the zero time.Time and the last error.
 func (t *Timex) Parse(s ...string) (value time.Time, err error) {
+	// A location that failed to load (see Rule.WithLocationRFC) must not silently fall back to local time.
+	if t.Rule != nil && t.locErr != nil {
+		return time.Time{}, t.locErr
+	}
+	if len(s) == 0 {
+		return time.Time{}, errors.New("timefy: no date string provided")
+	}
+
+	// The rule's location, when set, decides how strings are interpreted, whichever way the Timex was built.
+	base := t.Time
+	if loc := t.getTimeLocation(); loc != nil {
+		base = base.In(loc)
+	}
+
 	var (
 		setCurrentTime  bool
 		parseTime       []int
-		currentLocation = t.Location()
+		currentLocation = base.Location()
 		onlyTimeInStr   = true
-		currentTime     = FormatTimex(t.Time)
+		currentTime     []int
+		result          time.Time
+		parsed          bool
+		lastErr         error
 	)
 
-	for _, str := range s {
-		hasTimeInStr := TimeFormatRegexp.MatchString(str) // match 15:04:05, 15
-		onlyTimeInStr = hasTimeInStr && onlyTimeInStr && TimeOnlyRegexp.MatchString(str)
-		if value, err = t.parseWithFormat(str, currentLocation); err == nil {
-			location := value.Location()
-			parseTime = FormatTimex(value)
+	currentTime = FormatTimex(base)
 
-			for i, v := range parseTime {
-				// Don't reset hour, minute, second if current time str including time
-				if hasTimeInStr && i <= 3 {
+	for _, str := range s {
+		parsedValue, layout, perr := t.parseWithFormat(str, currentLocation)
+		if perr != nil {
+			// A failing string never discards a value parsed from another string.
+			lastErr = perr
+			continue
+		}
+
+		// Decide whether the string carries a time from the layout that matched it,
+		// not from a regular expression over the input text.
+		hasTimeInStr := layoutHasTime(layout)
+		onlyTimeInStr = hasTimeInStr && onlyTimeInStr && TimeOnlyRegexp.MatchString(str)
+
+		location := parsedValue.Location()
+		parseTime = FormatTimex(parsedValue)
+
+		for i, v := range parseTime {
+			// Don't reset hour, minute, second if current time str including time
+			if hasTimeInStr && i <= 3 {
+				continue
+			}
+
+			// If value is zero, replace it with current time
+			if v == 0 {
+				if setCurrentTime {
+					parseTime[i] = currentTime[i]
+				}
+			} else {
+				setCurrentTime = true
+			}
+
+			// if current time only includes time, should change day, month to current time
+			if onlyTimeInStr {
+				if i == 4 || i == 5 {
+					parseTime[i] = currentTime[i]
 					continue
 				}
-
-				// If value is zero, replace it with current time
-				if v == 0 {
-					if setCurrentTime {
-						parseTime[i] = currentTime[i]
-					}
-				} else {
-					setCurrentTime = true
-				}
-
-				// if current time only includes time, should change day, month to current time
-				if onlyTimeInStr {
-					if i == 4 || i == 5 {
-						parseTime[i] = currentTime[i]
-						continue
-					}
-				}
 			}
-			value = time.Date(parseTime[6], time.Month(parseTime[5]), parseTime[4], parseTime[3], parseTime[2], parseTime[1], parseTime[0], location)
-			currentTime = FormatTimex(value)
 		}
+		result = time.Date(parseTime[6], time.Month(parseTime[5]), parseTime[4], parseTime[3], parseTime[2], parseTime[1], parseTime[0], location)
+		currentTime = FormatTimex(result)
+		parsed = true
 	}
-	return
+
+	if !parsed {
+		return time.Time{}, lastErr
+	}
+	return result, nil
+}
+
+// layoutHasTime reports whether a time layout contains an hour element (15, 03 or 3),
+// meaning the strings it parses carry a time of day.
+func layoutHasTime(layout string) bool {
+	return strings.Contains(layout, "15") || strings.Contains(layout, "3")
 }
 
 // MustParse interprets the provided date string(s) and converts them into a time.Time value,
@@ -1117,70 +1162,74 @@ func (t *Timex) DefaultFormatRFC() string {
 	return t.FormatRFC(TimeFormat20060102150405999999)
 }
 
-// DurationInDays returns the duration between the current time and another time in days.
-//
-// Parameters:
-//   - `other`: The other time to calculate the duration from.
-//
-// Returns:
-//   - An integer representing the duration in days.
+// DurationInDays returns the number of whole calendar days from the current time to `other`
+// (`other` minus the current time), truncated toward zero. It is negative when `other` is earlier.
+// Days are counted on the calendar of the current time's location, so a 23- or 25-hour day around
+// a DST change still counts as one day.
 //
 // Example:
 //
 //	t := Timex{Time: time.Now()}
-//	formatted := t.DurationInDays(time.Now().AddDate(0, 0, 1)) // Returns 1
+//	days := t.DurationInDays(time.Now().AddDate(0, 0, 1)) // Returns 1
 func (t *Timex) DurationInDays(other time.Time) int {
-	return int(t.Sub(other).Hours() / 24)
+	return wholeUnits(t.Time, other, func(from time.Time, n int) time.Time { return from.AddDate(0, 0, n) },
+		func(d time.Duration) int { return int(d.Hours() / 24) })
 }
 
-// DurationInWeeks returns the duration between the current time and another time in weeks.
-//
-// Parameters:
-//   - `other`: The other time to calculate the duration from.
-//
-// Returns:
-//   - An integer representing the duration in weeks.
+// DurationInWeeks returns the number of whole weeks from the current time to `other`
+// (`other` minus the current time), truncated toward zero. It is negative when `other` is earlier.
 //
 // Example:
 //
 //	t := Timex{Time: time.Now()}
-//	formatted := t.DurationInWeeks(time.Now().AddDate(0, 0, 7)) // Returns 1
+//	weeks := t.DurationInWeeks(time.Now().AddDate(0, 0, 7)) // Returns 1
 func (t *Timex) DurationInWeeks(other time.Time) int {
 	return t.DurationInDays(other) / 7
 }
 
-// DurationInMonths returns the duration between the current time and another time in months.
-//
-// Parameters:
-//   - `other`: The other time to calculate the duration from.
-//
-// Returns:
-//   - An integer representing the duration in months.
+// DurationInMonths returns the number of whole calendar months from the current time to `other`
+// (`other` minus the current time), truncated toward zero. A month is complete only when the same
+// day and time of day has been reached, so January 31 to February 1 is 0 months.
+// It is negative when `other` is earlier.
 //
 // Example:
 //
 //	t := Timex{Time: time.Now()}
-//	formatted := t.DurationInMonths(time.Now().AddDate(0, 1, 0)) // Returns 1
+//	months := t.DurationInMonths(time.Now().AddDate(0, 1, 0)) // Returns 1
 func (t *Timex) DurationInMonths(other time.Time) int {
-	years := t.Year() - other.Year()
-	months := int(t.Month() - other.Month())
-	return years*12 + months
+	return wholeUnits(t.Time, other, func(from time.Time, n int) time.Time { return from.AddDate(0, n, 0) },
+		func(d time.Duration) int { return int(d.Hours() / (24 * 28)) })
 }
 
-// DurationInYears returns the duration between the current time and another time in years.
-//
-// Parameters:
-//   - `other`: The other time to calculate the duration from.
-//
-// Returns:
-//   - An integer representing the duration in years.
+// DurationInYears returns the number of whole calendar years from the current time to `other`
+// (`other` minus the current time), truncated toward zero. It is negative when `other` is earlier.
 //
 // Example:
 //
 //	t := Timex{Time: time.Now()}
-//	formatted := t.DurationInYears(time.Now().AddDate(1, 0, 0)) // Returns 1
+//	years := t.DurationInYears(time.Now().AddDate(1, 0, 0)) // Returns 1
 func (t *Timex) DurationInYears(other time.Time) int {
-	return t.Year() - other.Year()
+	return wholeUnits(t.Time, other, func(from time.Time, n int) time.Time { return from.AddDate(n, 0, 0) },
+		func(d time.Duration) int { return int(d.Hours() / (24 * 365)) })
+}
+
+// wholeUnits returns the largest n (toward zero) such that add(from, n) has not passed `to`.
+// `add` advances a time by n calendar units and `estimate` gives a starting guess from a duration;
+// the result is then corrected exactly, so DST changes and month lengths cannot skew it.
+func wholeUnits(from, to time.Time, add func(time.Time, int) time.Time, estimate func(time.Duration) int) int {
+	// Work in the location of `from` so calendar arithmetic follows its wall clock.
+	to = to.In(from.Location())
+	if to.Before(from) {
+		return -wholeUnits(to, from, add, estimate)
+	}
+	n := estimate(to.Sub(from))
+	for n > 0 && add(from, n).After(to) {
+		n--
+	}
+	for !add(from, n+1).After(to) {
+		n++
+	}
+	return n
 }
 
 // IsWeekend checks if the current time is a weekend (Saturday or Sunday).
@@ -1402,7 +1451,7 @@ func (t *Timex) IsFuture() bool {
 //
 // Note:
 //   - The function will return the first successfully parsed time value and ignore any subsequent formats.
-func (t *Timex) parseWithFormat(s string, location *time.Location) (v time.Time, err error) {
+func (t *Timex) parseWithFormat(s string, location *time.Location) (v time.Time, layout string, err error) {
 	formats := t.getTimeFormats()
 	if len(formats) == 0 {
 		err = fmt.Errorf("timefy: no time formats configured for parsing %q; ensure Timex is created via With() or NewRule().With()", s)
@@ -1412,9 +1461,11 @@ func (t *Timex) parseWithFormat(s string, location *time.Location) (v time.Time,
 		v, err = time.ParseInLocation(format, s, location)
 
 		if err == nil {
+			layout = format
 			return
 		}
 	}
+	v = time.Time{}
 	err = fmt.Errorf("timefy: can't parse string as time: %q", s)
 	return
 }

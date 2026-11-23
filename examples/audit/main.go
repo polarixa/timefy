@@ -162,14 +162,14 @@ func eventsInWindow(events []AuditEvent, start, end time.Time) []AuditEvent {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// formatComponents uses FormatTimex to extract individual time components for
+// formatComponents uses DateParts to extract individual time components for
 // a structured audit log line.
 //
-// FormatTimex returns [nanosecond, second, minute, hour, day, month, year]
+// DateParts returns [nanosecond, second, minute, hour, day, month, year]
 // which maps perfectly to a structured log field set.
 // ─────────────────────────────────────────────────────────────────────────────
 func structuredTimestamp(t time.Time) string {
-	c := timefy.FormatTimex(t)
+	c := timefy.DateParts(t)
 	// c = [ns, sec, min, hour, day, month, year]
 	return fmt.Sprintf("%04d-%02d-%02dT%02d:%02d:%02d.%09d UTC",
 		c[6], c[5], c[4], c[3], c[2], c[1], c[0])

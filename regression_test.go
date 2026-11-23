@@ -79,7 +79,7 @@ func TestTimeAgoFuture(t *testing.T) {
 func TestGetWeekdaysInRangeIncludesEndDay(t *testing.T) {
 	start := time.Date(2024, 10, 28, 8, 0, 0, 0, time.UTC)
 	end := time.Date(2024, 11, 1, 0, 0, 0, 0, time.UTC)
-	if got := timefy.GetWeekdaysInRange(start, end); len(got) != 5 {
+	if got := timefy.WeekdaysInRange(start, end); len(got) != 5 {
 		t.Errorf("got %d weekdays; want 5", len(got))
 	}
 }

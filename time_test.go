@@ -475,7 +475,7 @@ func TestTimexWithNilRule(t *testing.T) {
 	})
 }
 
-// TestGetWeekdaysInRangeLeapYear tests that GetWeekdaysInRange works correctly
+// TestGetWeekdaysInRangeLeapYear tests that WeekdaysInRange works correctly
 // with leap years (previously had a bug).
 func TestGetWeekdaysInRangeLeapYear(t *testing.T) {
 	// February 2020 was a leap year
@@ -483,12 +483,12 @@ func TestGetWeekdaysInRangeLeapYear(t *testing.T) {
 	start := time.Date(2020, time.February, 24, 0, 0, 0, 0, time.UTC) // Monday
 	end := time.Date(2020, time.March, 2, 0, 0, 0, 0, time.UTC)       // Monday
 
-	got := timefy.GetWeekdaysInRange(start, end)
+	got := timefy.WeekdaysInRange(start, end)
 
 	// Weekdays: Feb 24 (Mon), 25 (Tue), 26 (Wed), 27 (Thu), 28 (Fri), March 2 (Mon) = 6 days
 	// Feb 29 is Saturday, March 1 is Sunday - both skipped
 	if len(got) != 6 {
-		t.Errorf("GetWeekdaysInRange returned %d days; want 6", len(got))
+		t.Errorf("WeekdaysInRange returned %d days; want 6", len(got))
 	}
 
 	// Verify Feb 28 (Friday) is included
@@ -500,22 +500,22 @@ func TestGetWeekdaysInRangeLeapYear(t *testing.T) {
 		}
 	}
 	if !hasFeb28 {
-		t.Error("GetWeekdaysInRange should include Feb 28 (Friday)")
+		t.Error("WeekdaysInRange should include Feb 28 (Friday)")
 	}
 }
 
-// TestGetWeekdaysInRangeNonLeapYear tests that GetWeekdaysInRange works correctly
+// TestGetWeekdaysInRangeNonLeapYear tests that WeekdaysInRange works correctly
 // with non-leap years (previously had a bug where non-leap year days might be skipped).
 func TestGetWeekdaysInRangeNonLeapYear(t *testing.T) {
 	// February 2023 was not a leap year
 	start := time.Date(2023, time.February, 27, 0, 0, 0, 0, time.UTC) // Monday
 	end := time.Date(2023, time.March, 3, 0, 0, 0, 0, time.UTC)       // Friday
 
-	got := timefy.GetWeekdaysInRange(start, end)
+	got := timefy.WeekdaysInRange(start, end)
 
 	// Weekdays: Feb 27 (Mon), 28 (Tue), March 1 (Wed), 2 (Thu), 3 (Fri) = 5 days
 	if len(got) != 5 {
-		t.Errorf("GetWeekdaysInRange returned %d days; want 5", len(got))
+		t.Errorf("WeekdaysInRange returned %d days; want 5", len(got))
 		for i, d := range got {
 			t.Logf("Day %d: %v", i, d)
 		}
@@ -771,9 +771,9 @@ func TestBeginOfDay(t *testing.T) {
 func TestFEndOfDay(t *testing.T) {
 	v := time.Date(2023, 10, 25, 14, 30, 0, 0, time.UTC)
 	expected := time.Date(2023, 10, 25, 23, 59, 59, 0, time.UTC)
-	got := timefy.FEndOfDay(v)
+	got := timefy.EndOfDayOf(v)
 	if !got.Equal(expected) {
-		t.Errorf("FEndOfDay(%v) = %v; want %v", v, got, expected)
+		t.Errorf("EndOfDayOf(%v) = %v; want %v", v, got, expected)
 	}
 }
 
@@ -798,35 +798,35 @@ func TestPrevEndOfDay(t *testing.T) {
 func TestSetTimezone(t *testing.T) {
 	v := time.Date(2023, 10, 25, 14, 30, 0, 0, time.UTC)
 	tz := "America/New_York"
-	got, err := timefy.SetTimezone(v, tz)
+	got, err := timefy.InTimezone(v, tz)
 	if err != nil {
-		t.Errorf("SetTimezone(%v, %s) returned error: %v", v, tz, err)
+		t.Errorf("InTimezone(%v, %s) returned error: %v", v, tz, err)
 	}
 	loc, _ := time.LoadLocation(tz)
 	expected := v.In(loc)
 	if !got.Equal(expected) {
-		t.Errorf("SetTimezone(%v, %s) = %v; want %v", v, tz, got, expected)
+		t.Errorf("InTimezone(%v, %s) = %v; want %v", v, tz, got, expected)
 	}
 
-	_, err = timefy.SetTimezone(v, "Invalid/Timezone")
+	_, err = timefy.InTimezone(v, "Invalid/Timezone")
 	if err == nil {
-		t.Errorf("SetTimezone with invalid timezone should return error")
+		t.Errorf("InTimezone with invalid timezone should return error")
 	}
 }
 
 func TestAdjustTimezone(t *testing.T) {
 	v := time.Date(2023, 10, 25, 14, 30, 0, 0, time.UTC)
 	tz := "America/New_York"
-	got := timefy.AdjustTimezone(v, tz)
+	got := timefy.InTimezoneOrSame(v, tz)
 	loc, _ := time.LoadLocation(tz)
 	expected := v.In(loc)
 	if !got.Equal(expected) {
-		t.Errorf("AdjustTimezone(%v, %s) = %v; want %v", v, tz, got, expected)
+		t.Errorf("InTimezoneOrSame(%v, %s) = %v; want %v", v, tz, got, expected)
 	}
 
-	gotInvalid := timefy.AdjustTimezone(v, "Invalid/Timezone")
+	gotInvalid := timefy.InTimezoneOrSame(v, "Invalid/Timezone")
 	if !gotInvalid.Equal(v) {
-		t.Errorf("AdjustTimezone with invalid timezone should return original time")
+		t.Errorf("InTimezoneOrSame with invalid timezone should return original time")
 	}
 }
 
@@ -955,13 +955,13 @@ func TestIsLeapYear(t *testing.T) {
 
 func TestIsLeapYearN(t *testing.T) {
 	leapTime := time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)
-	if !timefy.IsLeapYearN(leapTime) {
-		t.Errorf("IsLeapYearN(2020) = false; want true")
+	if !timefy.IsLeapYearOf(leapTime) {
+		t.Errorf("IsLeapYearOf(2020) = false; want true")
 	}
 
 	nonLeapTime := time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)
-	if timefy.IsLeapYearN(nonLeapTime) {
-		t.Errorf("IsLeapYearN(2021) = true; want false")
+	if timefy.IsLeapYearOf(nonLeapTime) {
+		t.Errorf("IsLeapYearOf(2021) = true; want false")
 	}
 }
 
@@ -971,10 +971,10 @@ func TestGetWeekdaysInRange(t *testing.T) {
 	start := time.Date(2023, time.March, 1, 0, 0, 0, 0, time.UTC)
 	end := time.Date(2023, time.March, 6, 0, 0, 0, 0, time.UTC)
 
-	got := timefy.GetWeekdaysInRange(start, end)
+	got := timefy.WeekdaysInRange(start, end)
 	// Expected: 1, 2, 3, 6 (4 days)
 	if len(got) != 4 {
-		t.Errorf("GetWeekdaysInRange returned %d days; want 4", len(got))
+		t.Errorf("WeekdaysInRange returned %d days; want 4", len(got))
 	}
 
 	expectedDays := []int{1, 2, 3, 6}
@@ -1010,12 +1010,12 @@ func TestSince(t *testing.T) {
 
 func TestFormatTimex(t *testing.T) {
 	v := time.Date(2023, 10, 25, 14, 30, 45, 123456789, time.UTC)
-	got := timefy.FormatTimex(v)
+	got := timefy.DateParts(v)
 	expected := []int{123456789, 45, 30, 14, 25, 10, 2023}
 
 	for i, val := range got {
 		if val != expected[i] {
-			t.Errorf("FormatTimex[%d] = %d; want %d", i, val, expected[i])
+			t.Errorf("DateParts[%d] = %d; want %d", i, val, expected[i])
 		}
 	}
 }

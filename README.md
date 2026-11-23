@@ -224,8 +224,8 @@ func main() {
 	// BeginOfDay returns the start of the day (00:00:00)
 	fmt.Println(timefy.BeginOfDay(now)) // 2025-01-15 00:00:00 +0000 UTC
 
-	// FEndOfDay returns the end of the day (23:59:59)
-	fmt.Println(timefy.FEndOfDay(now)) // 2025-01-15 23:59:59 +0000 UTC
+	// EndOfDayOf returns the end of the day (23:59:59)
+	fmt.Println(timefy.EndOfDayOf(now)) // 2025-01-15 23:59:59 +0000 UTC
 
 	// PrevBeginOfDay returns the start of the day N days ago
 	fmt.Println(timefy.PrevBeginOfDay(now, 2)) // 2025-01-13 00:00:00 +0000 UTC
@@ -283,19 +283,19 @@ import (
 func main() {
 	now := time.Date(2025, 01, 15, 12, 0, 0, 0, time.UTC)
 
-	// SetTimezone converts time to a specific timezone (returns error if invalid)
-	nyTime, err := timefy.SetTimezone(now, "America/New_York")
+	// InTimezone converts time to a specific timezone (returns error if invalid)
+	nyTime, err := timefy.InTimezone(now, "America/New_York")
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
 	}
 	fmt.Println(nyTime) // 2025-01-15 07:00:00 -0500 EST
 
-	// AdjustTimezone converts time (returns original time on invalid timezone)
-	tokyoTime := timefy.AdjustTimezone(now, "Asia/Tokyo")
+	// InTimezoneOrSame converts time (returns original time on invalid timezone)
+	tokyoTime := timefy.InTimezoneOrSame(now, "Asia/Tokyo")
 	fmt.Println(tokyoTime) // 2025-01-15 21:00:00 +0900 JST
 
-	invalidTZ := timefy.AdjustTimezone(now, "Invalid/Zone")
+	invalidTZ := timefy.InTimezoneOrSame(now, "Invalid/Zone")
 	fmt.Println(invalidTZ) // 2025-01-15 12:00:00 +0000 UTC (original time returned)
 }
 ```
@@ -319,9 +319,9 @@ func main() {
 	fmt.Println(timefy.IsLeapYear(1900)) // false
 	fmt.Println(timefy.IsLeapYear(2000)) // true
 
-	// IsLeapYearN checks using a time.Time value
+	// IsLeapYearOf checks using a time.Time value
 	t := time.Date(2024, 6, 15, 0, 0, 0, 0, time.UTC)
-	fmt.Println(timefy.IsLeapYearN(t)) // true
+	fmt.Println(timefy.IsLeapYearOf(t)) // true
 
 	// IsWithinTolerance checks if a time is within 1 minute of now
 	now := time.Now()
@@ -415,15 +415,15 @@ func main() {
 	start := time.Date(2025, 1, 13, 0, 0, 0, 0, time.UTC) // Monday
 	end := time.Date(2025, 1, 19, 0, 0, 0, 0, time.UTC)   // Sunday
 
-	// GetWeekdaysInRange returns all weekdays (Mon-Fri) in the range
-	weekdays := timefy.GetWeekdaysInRange(start, end)
+	// WeekdaysInRange returns all weekdays (Mon-Fri) in the range
+	weekdays := timefy.WeekdaysInRange(start, end)
 	for _, d := range weekdays {
 		fmt.Println(d) // 2025-01-13, 2025-01-14, 2025-01-15, 2025-01-16, 2025-01-17
 	}
 }
 ```
 
-> FormatTimex (Extract Time Components)
+> DateParts (Extract Time Components)
 
 ```go
 package main
@@ -438,8 +438,8 @@ import (
 func main() {
 	t := time.Date(2025, 3, 15, 14, 30, 45, 123456789, time.UTC)
 
-	// FormatTimex returns a slice of time components: [nanosecond, second, minute, hour, day, month, year]
-	components := timefy.FormatTimex(t)
+	// DateParts returns a slice of time components: [nanosecond, second, minute, hour, day, month, year]
+	components := timefy.DateParts(t)
 	fmt.Println(components) // [123456789 45 30 14 15 3 2025]
 }
 ```
@@ -465,17 +465,17 @@ func main() {
 	// FormatRFCshort formats the current time using a short TimeRFC layout
 	fmt.Println(timefy.FormatRFCshort(timefy.TimeRFC01T150405))
 
-	// FFormatRFC formats a specific time with a TimeFormatRFC layout
-	fmt.Println(timefy.FFormatRFC(t, timefy.TimeFormat20060102T150405)) // 2025-08-15T13:45:30
+	// FormatRFCAt formats a specific time with a TimeFormatRFC layout
+	fmt.Println(timefy.FormatRFCAt(t, timefy.TimeFormat20060102T150405)) // 2025-08-15T13:45:30
 
-	// FFormatRFCshort formats a specific time with a short TimeRFC layout
-	fmt.Println(timefy.FFormatRFCshort(t, timefy.TimeRFC01T150405)) // 13:45:30
+	// FormatRFCshortAt formats a specific time with a short TimeRFC layout
+	fmt.Println(timefy.FormatRFCshortAt(t, timefy.TimeRFC01T150405)) // 13:45:30
 
 	// DefaultFormatRFC formats the current time with the default layout
 	fmt.Println(timefy.DefaultFormatRFC())
 
-	// FDefaultFormatRFC formats a specific time with the default layout
-	fmt.Println(timefy.FDefaultFormatRFC(t))
+	// DefaultFormatRFCAt formats a specific time with the default layout
+	fmt.Println(timefy.DefaultFormatRFCAt(t))
 }
 ```
 

@@ -26,20 +26,20 @@ import (
 
 // Schedule describes a recurring job's timing rules.
 type Schedule struct {
-	Name            string
-	RunHour         int           // UTC hour for the job to fire
-	RunMinute       int           // UTC minute for the job to fire
-	Frequency       string        // "daily" | "monthly" | "quarterly"
-	WindowMinutes   int           // anti-duplication window in minutes
-	Timezone        timefy.ZoneRFC // timezone for schedule evaluation
+	Name          string
+	RunHour       int            // UTC hour for the job to fire
+	RunMinute     int            // UTC minute for the job to fire
+	Frequency     string         // "daily" | "monthly" | "quarterly"
+	WindowMinutes int            // anti-duplication window in minutes
+	Timezone      timefy.ZoneRFC // timezone for schedule evaluation
 }
 
 // JobRun records a single execution of a scheduled job.
 type JobRun struct {
-	JobName   string
-	RanAt     time.Time
+	JobName    string
+	RanAt      time.Time
 	DurationMs int64
-	Status    string // "success" | "failure"
+	Status     string // "success" | "failure"
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -62,10 +62,11 @@ type JobRun struct {
 //     boundaries regardless of month length or DST.
 //   - AddDay + IsWeekday allow clean forward-stepping without manual
 //     month-wrap arithmetic.
+//
 // ─────────────────────────────────────────────────────────────────────────────
 func nextRunTime(s Schedule, now time.Time) time.Time {
 	// Evaluate schedule in the job's configured timezone.
-	localNow := timefy.AdjustTimezone(now, string(s.Timezone))
+	localNow := timefy.InTimezoneOrSame(now, string(s.Timezone))
 
 	switch s.Frequency {
 	case "daily":
@@ -139,6 +140,7 @@ func nextQuarterlyRun(s Schedule, localNow time.Time) time.Time {
 // Why IsBetween over a raw time.Sub comparison?
 //   - IsBetween is inclusive on both ends (equal to start or end is "within"),
 //     which correctly prevents a run at exactly the window boundary.
+//
 // ─────────────────────────────────────────────────────────────────────────────
 func isDuplicateRun(jobName string, history []JobRun, windowMinutes int, now time.Time) bool {
 	windowStart := timefy.AddMinute(now, -windowMinutes)
@@ -156,7 +158,7 @@ func isDuplicateRun(jobName string, history []JobRun, windowMinutes int, now tim
 // human-readable countdown.
 // ─────────────────────────────────────────────────────────────────────────────
 func businessDaysUntilRun(now, nextRun time.Time) int {
-	weekdays := timefy.GetWeekdaysInRange(timefy.BeginOfDay(now), timefy.BeginOfDay(nextRun))
+	weekdays := timefy.WeekdaysInRange(timefy.BeginOfDay(now), timefy.BeginOfDay(nextRun))
 	return len(weekdays)
 }
 
@@ -322,7 +324,7 @@ func main() {
 	fmt.Printf("  Weekdays this week:\n")
 	weekStart := timefy.New(now).BeginningOfWeek()
 	weekEnd := timefy.New(now).EndOfWeek()
-	for _, d := range timefy.GetWeekdaysInRange(weekStart, weekEnd) {
+	for _, d := range timefy.WeekdaysInRange(weekStart, weekEnd) {
 		fmt.Printf("    • %s\n", d.Format("Mon 2006-01-02"))
 	}
 }

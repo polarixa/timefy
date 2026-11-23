@@ -1,6 +1,10 @@
 package timefy
 
-import "time"
+import (
+	"fmt"
+	"slices"
+	"time"
+)
 
 // NewRule creates a new rule with the default configuration.
 //
@@ -53,7 +57,8 @@ func (c *Rule) WithWeekStartDay(weekStartDay time.Weekday) *Rule {
 //	rule.WithTimeFormats([]string{"2006-01-02 15:04:05"}) // This sets the time formats to the default time formats.
 //	return rule
 func (c *Rule) WithTimeFormats(timeFormats []string) *Rule {
-	c.timeFormats = timeFormats
+	// Copy so later appends never write into the caller's backing array.
+	c.timeFormats = slices.Clone(timeFormats)
 	return c
 }
 
@@ -72,6 +77,7 @@ func (c *Rule) WithTimeFormats(timeFormats []string) *Rule {
 //	return rule
 func (c *Rule) WithLocation(location *time.Location) *Rule {
 	c.timeLocation = location
+	c.locErr = nil
 	return c
 }
 
@@ -89,7 +95,14 @@ func (c *Rule) WithLocation(location *time.Location) *Rule {
 //	rule.WithLocationRFC(DefaultTimezoneVietnam) // This sets the time location to Vietnam.
 //	return rule
 func (c *Rule) WithLocationRFC(location ZoneRFC) *Rule {
-	c.timeLocation, _ = time.LoadLocation(string(location))
+	loc, err := time.LoadLocation(string(location))
+	if err != nil {
+		// Keep the previous location and remember the failure so Parse reports it.
+		c.locErr = fmt.Errorf("timefy: invalid location %q: %w", string(location), err)
+		return c
+	}
+	c.timeLocation = loc
+	c.locErr = nil
 	return c
 }
 
@@ -105,6 +118,7 @@ func (c *Rule) WithLocationRFC(location ZoneRFC) *Rule {
 //	return rule
 func (c *Rule) ApplyUTCLoc() *Rule {
 	c.timeLocation = time.UTC
+	c.locErr = nil
 	return c
 }
 
@@ -120,6 +134,7 @@ func (c *Rule) ApplyUTCLoc() *Rule {
 //	return rule
 func (c *Rule) ApplyLocalLoc() *Rule {
 	c.timeLocation = time.Local
+	c.locErr = nil
 	return c
 }
 
@@ -140,7 +155,7 @@ func (c *Rule) AppendTimeFormat(format ...string) *Rule {
 	if len(format) == 0 {
 		return c
 	}
-	c.timeFormats = append(c.timeFormats, format...)
+	c.timeFormats = append(slices.Clone(c.timeFormats), format...)
 	return c
 }
 
@@ -161,6 +176,7 @@ func (c *Rule) AppendTimeFormatRFC(format ...TimeFormatRFC) *Rule {
 	if len(format) == 0 {
 		return c
 	}
+	c.timeFormats = slices.Clone(c.timeFormats)
 	for _, f := range format {
 		c.timeFormats = append(c.timeFormats, string(f))
 	}
@@ -184,6 +200,7 @@ func (c *Rule) AppendTimeFormatRFCshort(format ...TimeRFC) *Rule {
 	if len(format) == 0 {
 		return c
 	}
+	c.timeFormats = slices.Clone(c.timeFormats)
 	for _, f := range format {
 		c.timeFormats = append(c.timeFormats, string(f))
 	}

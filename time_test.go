@@ -631,7 +631,7 @@ func TestApplyLocalLoc(t *testing.T) {
 	if err != nil {
 		t.Errorf("Parse failed: %v", err)
 	}
-	if parsed.Location().String() != "Local" { // time.Local string representation
+	if parsed.Location() != time.Local {
 		t.Errorf("Parse location = %v; want Local", parsed.Location())
 	}
 }

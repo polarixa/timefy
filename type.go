@@ -14,6 +14,9 @@ type Rule struct {
 	weekStartDay time.Weekday
 	timeLocation *time.Location
 	timeFormats  []string
+	// locErr records a failure to resolve the configured location (see WithLocationRFC);
+	// Parse reports it instead of silently falling back to local time.
+	locErr error
 }
 
 type Timex struct {

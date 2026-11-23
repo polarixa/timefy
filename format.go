@@ -22,6 +22,11 @@ func (t *Timex) TimeAgo() string {
 	now := time.Now()
 	diff := now.Sub(t.Time)
 
+	// A time in the future is described relative to now, not reported as "just now".
+	if diff < 0 {
+		return t.TimeUntil()
+	}
+
 	seconds := int(diff.Seconds())
 	minutes := int(diff.Minutes())
 	hours := int(diff.Hours())

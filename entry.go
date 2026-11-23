@@ -394,7 +394,13 @@ func IsLeapYearN(v time.Time) bool {
 //	weekdays := GetWeekdaysInRange(start, end) // This will return all weekdays between March 1 and March 10, 2023.
 func GetWeekdaysInRange(start time.Time, end time.Time) []time.Time {
 	var weekdays []time.Time
-	for current := start; current.Before(end) || current.Equal(end); current = current.AddDate(0, 0, 1) {
+	// Compare calendar dates, not timestamps, so the end day is included whatever the times of day are.
+	dateKey := func(v time.Time) int {
+		y, m, d := v.Date()
+		return y*10000 + int(m)*100 + d
+	}
+	endKey := dateKey(end)
+	for current := start; dateKey(current) <= endKey; current = current.AddDate(0, 0, 1) {
 		d := current.Weekday()
 		if d != time.Sunday && d != time.Saturday {
 			weekdays = append(weekdays, current)
@@ -975,6 +981,9 @@ func Parse(s ...string) (time.Time, error) {
 //		// Handle the parsing error
 //	}
 func ParseInLocation(loc *time.Location, s ...string) (time.Time, error) {
+	if loc == nil {
+		loc = time.Local
+	}
 	return With(time.Now().In(loc)).Parse(s...)
 }
 
@@ -1023,6 +1032,9 @@ func MustParse(s ...string) time.Time {
 //	timeValue := MustParseInLocation(time.UTC, "2023-10-25") // This will return the parsed time in UTC if the input string is in a valid format.
 //	// If the input is invalid, it will cause a panic.
 func MustParseInLocation(loc *time.Location, s ...string) time.Time {
+	if loc == nil {
+		loc = time.Local
+	}
 	return With(time.Now().In(loc)).MustParse(s...)
 }
 

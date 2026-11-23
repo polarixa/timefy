@@ -25,11 +25,11 @@ import (
 
 // Office describes a single regional office.
 type Office struct {
-	Name            string
-	Zone            timefy.ZoneRFC
-	BusinessStart   int // hour of day (local time) when office opens, e.g. 9
-	BusinessEnd     int // hour of day (local time) when office closes, e.g. 18
-	PublicHolidays  []time.Time // simplified: a few fixed holiday dates in UTC
+	Name           string
+	Zone           timefy.ZoneRFC
+	BusinessStart  int         // hour of day (local time) when office opens, e.g. 9
+	BusinessEnd    int         // hour of day (local time) when office closes, e.g. 18
+	PublicHolidays []time.Time // simplified: a few fixed holiday dates in UTC
 }
 
 // loc is a convenience method that loads the *time.Location for the office.
@@ -46,11 +46,11 @@ func (o Office) loc() *time.Location {
 //
 // Implementation note:
 //   - We first convert `t` to the office's local timezone with
-//     timefy.AdjustTimezone.
+//     timefy.InTimezoneOrSame.
 //   - We then use timefy.New(localT).IsWeekday() to exclude weekends.
 //   - Hour comparison uses the raw Hour() component of the converted time.
 func (o Office) IsBusinessHour(t time.Time) bool {
-	localT := timefy.AdjustTimezone(t, string(o.Zone))
+	localT := timefy.InTimezoneOrSame(t, string(o.Zone))
 	if !timefy.New(localT).IsWeekday() {
 		return false
 	}
@@ -60,14 +60,14 @@ func (o Office) IsBusinessHour(t time.Time) bool {
 
 // LocalTime converts a UTC time to the office's local time string.
 func (o Office) LocalTime(utc time.Time) string {
-	local := timefy.AdjustTimezone(utc, string(o.Zone))
+	local := timefy.InTimezoneOrSame(utc, string(o.Zone))
 	return local.Format("Mon 2006-01-02 15:04 MST")
 }
 
 // IsHoliday reports whether `t` falls on a public holiday for this office.
 // The comparison uses IsSameDay so the exact hour does not matter.
 func (o Office) IsHoliday(t time.Time) bool {
-	local := timefy.AdjustTimezone(t, string(o.Zone))
+	local := timefy.InTimezoneOrSame(t, string(o.Zone))
 	tx := timefy.New(local)
 	for _, h := range o.PublicHolidays {
 		if tx.IsSameDay(h) {
@@ -86,6 +86,7 @@ func (o Office) IsHoliday(t time.Time) bool {
 //	Timezone offsets can be as fine as 30 minutes (e.g., India +5:30, Nepal
 //	+5:45), so a 1-hour granularity is the correct minimal unit that gives
 //	deterministic results without sub-hour complexity.
+//
 // ─────────────────────────────────────────────────────────────────────────────
 func globalOverlapSlots(offices []Office, fromUTC time.Time, numHours int) []time.Time {
 	var slots []time.Time

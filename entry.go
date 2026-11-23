@@ -47,7 +47,7 @@ func BeginOfDay(v time.Time) time.Time {
 	return time.Date(v.Year(), v.Month(), v.Day(), 0, 0, 0, 0, v.Location())
 }
 
-// FEndOfDay takes a time value `v` and returns a new time.Time object
+// EndOfDayOf takes a time value `v` and returns a new time.Time object
 // representing the end of the day for that date.
 //
 // The function uses the time.Date method to set the time to the last possible second
@@ -66,8 +66,8 @@ func BeginOfDay(v time.Time) time.Time {
 // Example:
 //
 //	now := time.Now()
-//	endOfDay := FEndOfDay(now) // This will set the time to the last second of the current day.
-func FEndOfDay(v time.Time) time.Time {
+//	endOfDay := EndOfDayOf(now) // This will set the time to the last second of the current day.
+func EndOfDayOf(v time.Time) time.Time {
 	return time.Date(v.Year(), v.Month(), v.Day(), 23, 59, 59, 0, v.Location())
 }
 
@@ -118,10 +118,10 @@ func PrevBeginOfDay(v time.Time, day int) time.Time {
 //	twoDaysAgoEnd := PrevEndOfDay(now, 2) // This will return the end of the day two days before the current date.
 func PrevEndOfDay(v time.Time, day int) time.Time {
 	last := v.AddDate(0, 0, -day)
-	return FEndOfDay(last)
+	return EndOfDayOf(last)
 }
 
-// SetTimezone takes a time value `v` and a string `tz` representing the target timezone.
+// InTimezone takes a time value `v` and a string `tz` representing the target timezone.
 // It returns a new time.Time object with the same time as `v` but converted to the specified timezone `tz`.
 //
 // The function uses time.LoadLocation to load the location based on the timezone string `tz`.
@@ -144,8 +144,8 @@ func PrevEndOfDay(v time.Time, day int) time.Time {
 // Example:
 //
 //	now := time.Now()
-//	nyTime, err := SetTimezone(now, "America/New_York") // This will convert the current time to New York's timezone.
-func SetTimezone(v time.Time, tz string) (time.Time, error) {
+//	nyTime, err := InTimezone(now, "America/New_York") // This will convert the current time to New York's timezone.
+func InTimezone(v time.Time, tz string) (time.Time, error) {
 	loc, err := time.LoadLocation(tz)
 	if err != nil {
 		return v, err
@@ -154,12 +154,12 @@ func SetTimezone(v time.Time, tz string) (time.Time, error) {
 	return now, nil
 }
 
-// AdjustTimezone takes a time value `v` and a string `tz` representing the target timezone,
+// InTimezoneOrSame takes a time value `v` and a string `tz` representing the target timezone,
 // and attempts to adjust `v` to the specified timezone. If the timezone conversion fails (due to an invalid timezone),
 // the function returns the original time `v` without any changes.
 //
-// The function internally calls SetTimezone to convert the time `v` to the specified timezone `tz`.
-// If SetTimezone returns an error (e.g., if the timezone string is invalid), the function catches it and returns `v`.
+// The function internally calls InTimezone to convert the time `v` to the specified timezone `tz`.
+// If InTimezone returns an error (e.g., if the timezone string is invalid), the function catches it and returns `v`.
 // If no error occurs, it returns the adjusted time in the specified timezone.
 //
 // Parameters:
@@ -175,9 +175,9 @@ func SetTimezone(v time.Time, tz string) (time.Time, error) {
 // Example:
 //
 //	now := time.Now()
-//	adjustedTime := AdjustTimezone(now, "Europe/Paris") // This will adjust `now` to Paris' timezone if valid, or return `now` if invalid.
-func AdjustTimezone(v time.Time, tz string) time.Time {
-	t, err := SetTimezone(v, tz)
+//	adjustedTime := InTimezoneOrSame(now, "Europe/Paris") // This will adjust `now` to Paris' timezone if valid, or return `now` if invalid.
+func InTimezoneOrSame(v time.Time, tz string) time.Time {
+	t, err := InTimezone(v, tz)
 	if err != nil {
 		return v
 	}
@@ -348,7 +348,7 @@ func IsLeapYear(year int) bool {
 	return year%4 == 0 && (year%100 != 0 || year%400 == 0)
 }
 
-// IsLeapYearN checks if the year of the provided time value `v` is a leap year.
+// IsLeapYearOf checks if the year of the provided time value `v` is a leap year.
 //
 // The function retrieves the year from the time.Time object using the Year() method
 // and calls IsLeapYear to determine if that year is a leap year.
@@ -365,12 +365,12 @@ func IsLeapYear(year int) bool {
 // Example:
 //
 //	now := time.Now()
-//	isLeap := IsLeapYearN(now) // This will return true if the current year is a leap year.
-func IsLeapYearN(v time.Time) bool {
+//	isLeap := IsLeapYearOf(now) // This will return true if the current year is a leap year.
+func IsLeapYearOf(v time.Time) bool {
 	return IsLeapYear(v.Year())
 }
 
-// GetWeekdaysInRange returns a slice of time.Time objects representing all weekdays (Monday to Friday)
+// WeekdaysInRange returns a slice of time.Time objects representing all weekdays (Monday to Friday)
 // between the specified start and end dates, inclusive.
 //
 // The function iterates through each date from `start` to `end`, checking if each date is a weekday.
@@ -391,8 +391,8 @@ func IsLeapYearN(v time.Time) bool {
 //
 //	start := time.Date(2023, time.March, 1, 0, 0, 0, 0, time.UTC)
 //	end := time.Date(2023, time.March, 10, 0, 0, 0, 0, time.UTC)
-//	weekdays := GetWeekdaysInRange(start, end) // This will return all weekdays between March 1 and March 10, 2023.
-func GetWeekdaysInRange(start time.Time, end time.Time) []time.Time {
+//	weekdays := WeekdaysInRange(start, end) // This will return all weekdays between March 1 and March 10, 2023.
+func WeekdaysInRange(start time.Time, end time.Time) []time.Time {
 	var weekdays []time.Time
 	// Compare calendar dates, not timestamps, so the end day is included whatever the times of day are.
 	dateKey := func(v time.Time) int {
@@ -478,7 +478,7 @@ func SinceSecond(v time.Time) float64 {
 	return seconds
 }
 
-// FormatTimex converts a given time.Time value into a slice of integers representing various time components.
+// DateParts converts a given time.Time value into a slice of integers representing various time components.
 //
 // The function extracts the hour, minute, second, nanosecond, day, month, and year from the provided
 // time.Time value. It then returns these components in a specific order as a slice of integers.
@@ -504,8 +504,8 @@ func SinceSecond(v time.Time) float64 {
 // Example:
 //
 //	t := time.Date(2023, time.March, 15, 8, 0, 0, 0, time.UTC)
-//	formatted := FormatTimex(t) // This will return a slice with the components [0, 0, 0, 8, 15, 3, 2023].
-func FormatTimex(t time.Time) []int {
+//	formatted := DateParts(t) // This will return a slice with the components [0, 0, 0, 8, 15, 3, 2023].
+func DateParts(t time.Time) []int {
 	hour, min, sec := t.Clock()
 	year, month, day := t.Date()
 	return []int{t.Nanosecond(), sec, min, hour, day, int(month), year}
@@ -1090,7 +1090,7 @@ func FormatRFCshort(layout TimeRFC) string {
 	return With(time.Now()).FormatRFCshort(layout)
 }
 
-// FormatRFC formats the time using the provided layout.
+// FormatRFCAt formats the time v using the provided layout.
 //
 // Parameters:
 //   - `v`: A time.Time value representing the time to format.
@@ -1102,11 +1102,11 @@ func FormatRFCshort(layout TimeRFC) string {
 // Example:
 //
 //	formatted := FormatRFC(v, TimeFormat20060102T150405) // Returns the formatted time in the format "2023-08-15 13:45:30".
-func FFormatRFC(v time.Time, layout TimeFormatRFC) string {
+func FormatRFCAt(v time.Time, layout TimeFormatRFC) string {
 	return With(v).FormatRFC(layout)
 }
 
-// FormatRFCshort formats the time using the provided layout.
+// FormatRFCshortAt formats the time v using the provided layout.
 //
 // Parameters:
 //   - `v`: A time.Time value representing the time to format.
@@ -1118,11 +1118,11 @@ func FFormatRFC(v time.Time, layout TimeFormatRFC) string {
 // Example:
 //
 //	formatted := FormatRFCshort(v, TimeRFC01T150405) // Returns the formatted time in the format "13:45:30".
-func FFormatRFCshort(v time.Time, layout TimeRFC) string {
+func FormatRFCshortAt(v time.Time, layout TimeRFC) string {
 	return With(v).FormatRFCshort(layout)
 }
 
-// DefaultFormatRFC formats the time using the default layout.
+// DefaultFormatRFCAt formats the time v using the default layout.
 //
 // Parameters:
 //   - `v`: A time.Time value representing the time to format.
@@ -1134,7 +1134,7 @@ func FFormatRFCshort(v time.Time, layout TimeRFC) string {
 //
 //	v := time.Date(2023, time.August, 15, 13, 45, 30, 0, time.UTC)
 //	formatted := DefaultFormatRFC(v) // Returns the formatted time in the default format.
-func FDefaultFormatRFC(v time.Time) string {
+func DefaultFormatRFCAt(v time.Time) string {
 	return With(v).DefaultFormatRFC()
 }
 
@@ -1147,5 +1147,52 @@ func FDefaultFormatRFC(v time.Time) string {
 //
 //	formatted := DefaultFormatRFC() // Returns the formatted current time in the default format.
 func DefaultFormatRFC() string {
-	return FDefaultFormatRFC(time.Now())
+	return DefaultFormatRFCAt(time.Now())
+}
+
+// FEndOfDay returns the last second of the day of v.
+//
+// Deprecated: use EndOfDayOf.
+func FEndOfDay(v time.Time) time.Time { return EndOfDayOf(v) }
+
+// FFormatRFC formats v using the given layout.
+//
+// Deprecated: use FormatRFCAt.
+func FFormatRFC(v time.Time, layout TimeFormatRFC) string { return FormatRFCAt(v, layout) }
+
+// FFormatRFCshort formats v using the given short layout.
+//
+// Deprecated: use FormatRFCshortAt.
+func FFormatRFCshort(v time.Time, layout TimeRFC) string { return FormatRFCshortAt(v, layout) }
+
+// FDefaultFormatRFC formats v using the default layout.
+//
+// Deprecated: use DefaultFormatRFCAt.
+func FDefaultFormatRFC(v time.Time) string { return DefaultFormatRFCAt(v) }
+
+// IsLeapYearN reports whether the year of v is a leap year.
+//
+// Deprecated: use IsLeapYearOf.
+func IsLeapYearN(v time.Time) bool { return IsLeapYearOf(v) }
+
+// FormatTimex returns the date and clock parts of t.
+//
+// Deprecated: use DateParts.
+func FormatTimex(t time.Time) []int { return DateParts(t) }
+
+// SetTimezone converts v to the timezone tz.
+//
+// Deprecated: use InTimezone.
+func SetTimezone(v time.Time, tz string) (time.Time, error) { return InTimezone(v, tz) }
+
+// AdjustTimezone converts v to the timezone tz, or returns v if tz is invalid.
+//
+// Deprecated: use InTimezoneOrSame.
+func AdjustTimezone(v time.Time, tz string) time.Time { return InTimezoneOrSame(v, tz) }
+
+// GetWeekdaysInRange returns all weekdays between start and end, inclusive.
+//
+// Deprecated: use WeekdaysInRange.
+func GetWeekdaysInRange(start time.Time, end time.Time) []time.Time {
+	return WeekdaysInRange(start, end)
 }

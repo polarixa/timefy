@@ -21,20 +21,20 @@ import (
 // Subscription holds all metadata for a single tenant's billing record.
 type Subscription struct {
 	TenantID    string
-	Plan        string        // "monthly" | "quarterly" | "annual"
-	StartedAt   time.Time     // exact moment the subscription became active
-	PricePerDay float64       // daily rate in USD
-	TrialDays   int           // number of free trial days (0 = no trial)
+	Plan        string         // "monthly" | "quarterly" | "annual"
+	StartedAt   time.Time      // exact moment the subscription became active
+	PricePerDay float64        // daily rate in USD
+	TrialDays   int            // number of free trial days (0 = no trial)
 	Timezone    timefy.ZoneRFC // tenant's billing timezone
 }
 
 // InvoicePeriod describes a single billable window.
 type InvoicePeriod struct {
-	Start       time.Time
-	End         time.Time
+	Start        time.Time
+	End          time.Time
 	BillableDays int
-	Amount      float64
-	Label       string
+	Amount       float64
+	Label        string
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -48,11 +48,12 @@ type InvoicePeriod struct {
 //   - BeginningOfQuarter / EndOfQuarter eliminate the common off-by-one month
 //     bug when computing quarterly reports.
 //   - BeginningOfYear / EndOfYear handle the year-wrap edge case.
+//
 // ─────────────────────────────────────────────────────────────────────────────
 func billingPeriodBoundaries(s Subscription, referenceTime time.Time) (start, end time.Time) {
 	// Convert reference time to the tenant's billing timezone so that
 	// month and year boundaries are evaluated in their local context.
-	localRef := timefy.AdjustTimezone(referenceTime, string(s.Timezone))
+	localRef := timefy.InTimezoneOrSame(referenceTime, string(s.Timezone))
 	tx := timefy.New(localRef)
 
 	switch s.Plan {
@@ -71,7 +72,7 @@ func billingPeriodBoundaries(s Subscription, referenceTime time.Time) (start, en
 	default:
 		// Fallback: 30-day window anchored to the subscription start day.
 		start = timefy.BeginOfDay(s.StartedAt)
-		end = timefy.FEndOfDay(timefy.AddDay(start, 30))
+		end = timefy.EndOfDayOf(timefy.AddDay(start, 30))
 	}
 	return
 }
@@ -83,6 +84,7 @@ func billingPeriodBoundaries(s Subscription, referenceTime time.Time) (start, en
 //   - timefy.AddDay wraps time.Add(24 * n * time.Hour), which correctly
 //     accounts for DST transitions — unlike AddDate(0, 0, n) when the tenant
 //     timezone observes daylight saving.
+//
 // ─────────────────────────────────────────────────────────────────────────────
 func trialEndsAt(s Subscription) time.Time {
 	if s.TrialDays == 0 {
@@ -115,6 +117,7 @@ func isInTrial(s Subscription, now time.Time) bool {
 //   - Annual period: Jan 1 – Dec 31 (365 days).
 //   - Days actually used: March 15 → Dec 31 = 291 days.
 //   - Charge: 291 × $1 = $291 (instead of $365).
+//
 // ─────────────────────────────────────────────────────────────────────────────
 func proRateForPeriod(s Subscription, periodStart, periodEnd time.Time) InvoicePeriod {
 	// Effective start is the later of periodStart and the subscription start.
@@ -269,10 +272,10 @@ func main() {
 	fmt.Println("\n── Timezone-aware billing boundary demo ─────────────────────")
 	// 2025-03-31 23:00 UTC is 2025-04-01 09:00 in Vietnam (+7).
 	// For a Vietnamese tenant on a monthly plan, this moment belongs to April,
-	// not March — timefy.AdjustTimezone ensures the boundary is evaluated
+	// not March — timefy.InTimezoneOrSame ensures the boundary is evaluated
 	// in the correct timezone.
 	borderTime := time.Date(2025, time.March, 31, 23, 0, 0, 0, time.UTC)
-	vnTime := timefy.AdjustTimezone(borderTime, string(timefy.DefaultTimezoneVietnam))
+	vnTime := timefy.InTimezoneOrSame(borderTime, string(timefy.DefaultTimezoneVietnam))
 	vnTx := timefy.New(vnTime)
 	fmt.Printf("  UTC time               : %s\n", borderTime.Format("2006-01-02 15:04 MST"))
 	fmt.Printf("  Vietnam time           : %s\n", vnTime.Format("2006-01-02 15:04 MST"))

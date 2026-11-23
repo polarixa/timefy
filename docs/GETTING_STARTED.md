@@ -8,68 +8,82 @@
 
 ## Table of Contents
 
-1. [Introduction & Design Philosophy](#1-introduction--design-philosophy)
-2. [Architecture Overview](#2-architecture-overview)
-3. [Installation](#3-installation)
-4. [Core Type System](#4-core-type-system)
-   - 4.1 [TimeRFC — Short Time Layouts](#41-timerfc--short-time-layouts)
-   - 4.2 [TimeFormatRFC — Full Date-Time Layouts](#42-timeformatrfc--full-date-time-layouts)
-   - 4.3 [ZoneRFC — IANA Timezone Identifiers](#43-zonerfc--iana-timezone-identifiers)
-   - 4.4 [Rule — Configuration Object](#44-rule--configuration-object)
-   - 4.5 [Timex — The Enriched Time Value](#45-timex--the-enriched-time-value)
-5. [Getting Started: Wrapping Time Values](#5-getting-started-wrapping-time-values)
-6. [Time Boundaries](#6-time-boundaries)
-   - 6.1 [Minute and Hour Boundaries](#61-minute-and-hour-boundaries)
-   - 6.2 [Day Boundaries](#62-day-boundaries)
-   - 6.3 [Week Boundaries](#63-week-boundaries)
-   - 6.4 [Month Boundaries](#64-month-boundaries)
-   - 6.5 [Quarter Boundaries](#65-quarter-boundaries)
-   - 6.6 [Half-Year Boundaries](#66-half-year-boundaries)
-   - 6.7 [Year Boundaries](#67-year-boundaries)
-   - 6.8 [Global Convenience Functions](#68-global-convenience-functions)
-7. [Day Operations](#7-day-operations)
-8. [Time Arithmetic](#8-time-arithmetic)
-9. [Parsing Strings into Time](#9-parsing-strings-into-time)
-   - 9.1 [The Parse Contract](#91-the-parse-contract)
-   - 9.2 [Parse — Safe Variant](#92-parse--safe-variant)
-   - 9.3 [MustParse — Panic-on-Failure Variant](#93-mustparse--panic-on-failure-variant)
-   - 9.4 [ParseInLocation and MustParseInLocation](#94-parseinlocation-and-mustparseinlocation)
-   - 9.5 [Extending the Format Registry](#95-extending-the-format-registry)
-10. [Formatting Time](#10-formatting-time)
-    - 10.1 [Go's Reference Time](#101-gos-reference-time)
-    - 10.2 [FormatRFC and FormatRFCshort](#102-formatrfc-and-formatrfcshort)
-    - 10.3 [FormatTimex — Component Extraction](#103-formattimex--component-extraction)
-11. [Timezone Operations](#11-timezone-operations)
-    - 11.1 [SetTimezone vs AdjustTimezone](#111-settimezone-vs-adjusttimezone)
-    - 11.2 [Predefined ZoneRFC Constants](#112-predefined-zonerfc-constants)
-    - 11.3 [Rule-based Timezone Configuration](#113-rule-based-timezone-configuration)
-12. [Weekday Navigation](#12-weekday-navigation)
-13. [Human-Readable Relative Time](#13-human-readable-relative-time)
-    - 13.1 [TimeAgo](#131-timeago)
-    - 13.2 [TimeUntil](#132-timeuntil)
-14. [Duration Calculations](#14-duration-calculations)
-15. [Time Comparisons](#15-time-comparisons)
-    - 15.1 [Ordinal Comparisons](#151-ordinal-comparisons)
-    - 15.2 [Range Membership](#152-range-membership)
-    - 15.3 [Calendrical Identity](#153-calendrical-identity)
-    - 15.4 [Temporal Position](#154-temporal-position)
-    - 15.5 [Day-Type Checks](#155-day-type-checks)
-16. [Between (String-based Range Check)](#16-between-string-based-range-check)
-17. [Elapsed Time Measurements](#17-elapsed-time-measurements)
-18. [Leap Year Utilities](#18-leap-year-utilities)
-19. [Weekdays in Range](#19-weekdays-in-range)
-20. [Tolerance Window](#20-tolerance-window)
-21. [Quarter Number](#21-quarter-number)
-22. [Rule Configuration — Full API](#22-rule-configuration--full-api)
-23. [Advanced Patterns](#23-advanced-patterns)
-    - 23.1 [Fluent Builder Chains](#231-fluent-builder-chains)
-    - 23.2 [Multi-tenant Timezone Isolation](#232-multi-tenant-timezone-isolation)
-    - 23.3 [Custom Format Registries](#233-custom-format-registries)
-    - 23.4 [Safe vs Panic Patterns](#234-safe-vs-panic-patterns)
-24. [Enterprise Use Cases](#24-enterprise-use-cases)
-25. [API Quick-Reference](#25-api-quick-reference)
-26. [Format Constant Reference](#26-format-constant-reference)
-27. [Timezone Constant Reference](#27-timezone-constant-reference)
+- [timefy — Comprehensive Technical Documentation](#timefy--comprehensive-technical-documentation)
+  - [Table of Contents](#table-of-contents)
+  - [1. Introduction \& Design Philosophy](#1-introduction--design-philosophy)
+    - [Why `timefy` exists](#why-timefy-exists)
+    - [Design decisions](#design-decisions)
+  - [2. Architecture Overview](#2-architecture-overview)
+  - [3. Installation](#3-installation)
+  - [4. Core Type System](#4-core-type-system)
+    - [4.1 TimeRFC — Short Time Layouts](#41-timerfc--short-time-layouts)
+    - [4.2 TimeFormatRFC — Full Date-Time Layouts](#42-timeformatrfc--full-date-time-layouts)
+    - [4.3 ZoneRFC — IANA Timezone Identifiers](#43-zonerfc--iana-timezone-identifiers)
+    - [4.4 Rule — Configuration Object](#44-rule--configuration-object)
+    - [4.5 Timex — The Enriched Time Value](#45-timex--the-enriched-time-value)
+  - [5. Getting Started: Wrapping Time Values](#5-getting-started-wrapping-time-values)
+  - [6. Time Boundaries](#6-time-boundaries)
+    - [6.1 Minute and Hour Boundaries](#61-minute-and-hour-boundaries)
+    - [6.2 Day Boundaries](#62-day-boundaries)
+    - [6.3 Week Boundaries](#63-week-boundaries)
+    - [6.4 Month Boundaries](#64-month-boundaries)
+    - [6.5 Quarter Boundaries](#65-quarter-boundaries)
+    - [6.6 Half-Year Boundaries](#66-half-year-boundaries)
+    - [6.7 Year Boundaries](#67-year-boundaries)
+    - [6.8 Global Convenience Functions](#68-global-convenience-functions)
+  - [7. Day Operations](#7-day-operations)
+  - [8. Time Arithmetic](#8-time-arithmetic)
+  - [9. Parsing Strings into Time](#9-parsing-strings-into-time)
+    - [9.1 The Parse Contract](#91-the-parse-contract)
+    - [9.2 Parse — Safe Variant](#92-parse--safe-variant)
+    - [9.3 MustParse — Panic-on-Failure Variant](#93-mustparse--panic-on-failure-variant)
+    - [9.4 ParseInLocation and MustParseInLocation](#94-parseinlocation-and-mustparseinlocation)
+    - [9.5 Extending the Format Registry](#95-extending-the-format-registry)
+  - [10. Formatting Time](#10-formatting-time)
+    - [10.1 Go's Reference Time](#101-gos-reference-time)
+    - [10.2 FormatRFC and FormatRFCshort](#102-formatrfc-and-formatrfcshort)
+    - [10.3 DateParts — Component Extraction](#103-dateparts--component-extraction)
+  - [11. Timezone Operations](#11-timezone-operations)
+    - [11.1 InTimezone vs InTimezoneOrSame](#111-intimezone-vs-intimezoneorsame)
+    - [11.2 Predefined ZoneRFC Constants](#112-predefined-zonerfc-constants)
+    - [11.3 Rule-based Timezone Configuration](#113-rule-based-timezone-configuration)
+  - [12. Weekday Navigation](#12-weekday-navigation)
+  - [13. Human-Readable Relative Time](#13-human-readable-relative-time)
+    - [13.1 TimeAgo](#131-timeago)
+    - [13.2 TimeUntil](#132-timeuntil)
+  - [14. Duration Calculations](#14-duration-calculations)
+  - [15. Time Comparisons](#15-time-comparisons)
+    - [15.1 Ordinal Comparisons](#151-ordinal-comparisons)
+    - [15.2 Range Membership](#152-range-membership)
+    - [15.3 Calendrical Identity](#153-calendrical-identity)
+    - [15.4 Temporal Position](#154-temporal-position)
+    - [15.5 Day-Type Checks](#155-day-type-checks)
+  - [16. Between (String-based Range Check)](#16-between-string-based-range-check)
+  - [17. Elapsed Time Measurements](#17-elapsed-time-measurements)
+  - [18. Leap Year Utilities](#18-leap-year-utilities)
+  - [19. Weekdays in Range](#19-weekdays-in-range)
+  - [20. Tolerance Window](#20-tolerance-window)
+  - [21. Quarter Number](#21-quarter-number)
+  - [22. Rule Configuration — Full API](#22-rule-configuration--full-api)
+  - [23. Advanced Patterns](#23-advanced-patterns)
+    - [23.1 Fluent Builder Chains](#231-fluent-builder-chains)
+    - [23.2 Multi-tenant Timezone Isolation](#232-multi-tenant-timezone-isolation)
+    - [23.3 Custom Format Registries](#233-custom-format-registries)
+    - [23.4 Safe vs Panic Patterns](#234-safe-vs-panic-patterns)
+  - [24. Enterprise Use Cases](#24-enterprise-use-cases)
+    - [`examples/billing/` — SaaS Subscription Billing](#examplesbilling--saas-subscription-billing)
+    - [`examples/global_team/` — Multi-Timezone Team Coordination](#examplesglobal_team--multi-timezone-team-coordination)
+    - [`examples/audit/` — Enterprise Audit Trail \& Compliance](#examplesaudit--enterprise-audit-trail--compliance)
+    - [`examples/reporting/` — Financial Quarter \& Fiscal-Year Reporting](#examplesreporting--financial-quarter--fiscal-year-reporting)
+    - [`examples/scheduler/` — Business-Day-Aware Job Scheduler](#examplesscheduler--business-day-aware-job-scheduler)
+  - [25. API Quick-Reference](#25-api-quick-reference)
+    - [Package-level functions](#package-level-functions)
+    - [Timex methods](#timex-methods)
+    - [Rule methods](#rule-methods)
+  - [26. Format Constant Reference](#26-format-constant-reference)
+    - [Short formats (TimeRFC)](#short-formats-timerfc)
+    - [Full formats (TimeFormatRFC) — selected](#full-formats-timeformatrfc--selected)
+  - [27. Timezone Constant Reference](#27-timezone-constant-reference)
 
 ---
 
@@ -399,8 +413,8 @@ func main() {
 
     // Package-level equivalents using a concrete time.Time (not Timex):
     fmt.Println(timefy.BeginOfDay(t))  // 2025-03-15 00:00:00 +0000 UTC
-    fmt.Println(timefy.FEndOfDay(t))   // 2025-03-15 23:59:59 +0000 UTC
-    // Note: FEndOfDay truncates at seconds (no nanoseconds); prefer
+    fmt.Println(timefy.EndOfDayOf(t))   // 2025-03-15 23:59:59 +0000 UTC
+    // Note: EndOfDayOf truncates at seconds (no nanoseconds); prefer
     // New(t).EndOfDay() when nanosecond precision is required.
 
     // Previous day boundaries:
@@ -648,9 +662,9 @@ func main() {
     // BeginOfDay: equivalent to Timex.BeginningOfDay but takes a time.Time.
     fmt.Println(timefy.BeginOfDay(t))  // 2025-03-15 00:00:00 +0000 UTC
 
-    // FEndOfDay: end of day at second precision (23:59:59, no nanoseconds).
+    // EndOfDayOf: end of day at second precision (23:59:59, no nanoseconds).
     // Use Timex.EndOfDay() when nanosecond precision is required.
-    fmt.Println(timefy.FEndOfDay(t))   // 2025-03-15 23:59:59 +0000 UTC
+    fmt.Println(timefy.EndOfDayOf(t))   // 2025-03-15 23:59:59 +0000 UTC
 
     // PrevBeginOfDay(t, n): start of the day n days before t.
     fmt.Println(timefy.PrevBeginOfDay(t, 1)) // 2025-03-14 00:00:00 (yesterday)
@@ -932,13 +946,13 @@ func main() {
     fmt.Println(timefy.DefaultFormatRFC())
 
     // Package-level variants for a specific time.Time:
-    fmt.Println(timefy.FFormatRFC(t, timefy.TimeFormat20060102T150405))
-    fmt.Println(timefy.FFormatRFCshort(t, timefy.TimeRFC01T150405))
-    fmt.Println(timefy.FDefaultFormatRFC(t))
+    fmt.Println(timefy.FormatRFCAt(t, timefy.TimeFormat20060102T150405))
+    fmt.Println(timefy.FormatRFCshortAt(t, timefy.TimeRFC01T150405))
+    fmt.Println(timefy.DefaultFormatRFCAt(t))
 }
 ```
 
-### 10.3 FormatTimex — Component Extraction
+### 10.3 DateParts — Component Extraction
 
 ```go
 package main
@@ -953,8 +967,8 @@ import (
 func main() {
     t := time.Date(2025, 3, 15, 14, 30, 45, 123456789, time.UTC)
 
-    // FormatTimex returns []int{nanosecond, second, minute, hour, day, month, year}
-    c := timefy.FormatTimex(t)
+    // DateParts returns []int{nanosecond, second, minute, hour, day, month, year}
+    c := timefy.DateParts(t)
     // c = [123456789, 45, 30, 14, 15, 3, 2025]
     //      ns         sec min  hr  day mo  year
 
@@ -966,7 +980,7 @@ func main() {
     fmt.Printf("Second: %d\n", c[1])  // 45
     fmt.Printf("Nano:   %d\n", c[0])  // 123456789
 
-    // FormatTimex is used internally by Timex.Parse to reconstruct a
+    // DateParts is used internally by Timex.Parse to reconstruct a
     // time.Time from partially-parsed components.  It is also useful
     // in structured logging where individual components are separate fields.
 }
@@ -976,7 +990,7 @@ func main() {
 
 ## 11. Timezone Operations
 
-### 11.1 SetTimezone vs AdjustTimezone
+### 11.1 InTimezone vs InTimezoneOrSame
 
 ```go
 package main
@@ -991,28 +1005,28 @@ import (
 func main() {
     utc := time.Date(2025, 3, 15, 12, 0, 0, 0, time.UTC)
 
-    // SetTimezone: converts the time to a new timezone.
+    // InTimezone: converts the time to a new timezone.
     // Returns an error if the timezone name is invalid.
-    nyTime, err := timefy.SetTimezone(utc, "America/New_York")
+    nyTime, err := timefy.InTimezone(utc, "America/New_York")
     if err != nil {
         fmt.Println("Error:", err) // e.g., "unknown time zone Foo/Bar"
         return
     }
     fmt.Println(nyTime)  // 2025-03-15 08:00:00 -0400 EDT (UTC-4 in DST)
 
-    // AdjustTimezone: same as SetTimezone but returns the original time
+    // InTimezoneOrSame: same as InTimezone but returns the original time
     // unchanged if the timezone name is invalid (no error return).
     // Use this when timezone validity is guaranteed.
-    tokyoTime := timefy.AdjustTimezone(utc, "Asia/Tokyo")
+    tokyoTime := timefy.InTimezoneOrSame(utc, "Asia/Tokyo")
     fmt.Println(tokyoTime) // 2025-03-15 21:00:00 +0900 JST
 
     // Invalid timezone: original time returned silently.
-    invalid := timefy.AdjustTimezone(utc, "Invalid/Zone")
+    invalid := timefy.InTimezoneOrSame(utc, "Invalid/Zone")
     fmt.Println(invalid) // 2025-03-15 12:00:00 +0000 UTC (unchanged)
 
     // The two functions differ in error handling strategy:
-    //   SetTimezone  → explicit error → use in validation paths
-    //   AdjustTimezone → silent fallback → use in rendering paths
+    //   InTimezone  → explicit error → use in validation paths
+    //   InTimezoneOrSame → silent fallback → use in rendering paths
 }
 ```
 
@@ -1045,7 +1059,7 @@ func main() {
     }
 
     for _, z := range zones {
-        local := timefy.AdjustTimezone(utc, string(z))
+        local := timefy.InTimezoneOrSame(utc, string(z))
         fmt.Printf("  %-30s → %s\n", z, local.Format("15:04 MST"))
     }
 }
@@ -1073,7 +1087,7 @@ func main() {
 
     // rule.With creates a Timex whose boundaries are evaluated in Vietnam time.
     base := time.Date(2025, 3, 31, 23, 0, 0, 0, time.UTC)
-    local := timefy.AdjustTimezone(base, string(timefy.DefaultTimezoneVietnam))
+    local := timefy.InTimezoneOrSame(base, string(timefy.DefaultTimezoneVietnam))
     txVN := rule.With(local)
     fmt.Println(txVN.BeginningOfMonth()) // 2025-04-01 00:00:00 +0700 +07
     // ↑ Note: 23:00 UTC is 06:00 next-day in Vietnam.
@@ -1516,9 +1530,9 @@ func main() {
     fmt.Println(timefy.IsLeapYear(2000)) // true  (÷400)
     fmt.Println(timefy.IsLeapYear(2100)) // false (÷100 but not ÷400)
 
-    // IsLeapYearN(t): convenience wrapper extracting the year from t.
+    // IsLeapYearOf(t): convenience wrapper extracting the year from t.
     t2024 := time.Date(2024, 6, 15, 0, 0, 0, 0, time.UTC)
-    fmt.Println(timefy.IsLeapYearN(t2024)) // true
+    fmt.Println(timefy.IsLeapYearOf(t2024)) // true
 
     // Practical: determine February end for a dynamic billing calculation.
     for _, yr := range []int{2023, 2024, 2025} {
@@ -1553,7 +1567,7 @@ func main() {
     start := time.Date(2025, 1, 13, 0, 0, 0, 0, time.UTC) // Monday
     end   := time.Date(2025, 1, 19, 0, 0, 0, 0, time.UTC) // Sunday
 
-    weekdays := timefy.GetWeekdaysInRange(start, end)
+    weekdays := timefy.WeekdaysInRange(start, end)
     for _, d := range weekdays {
         fmt.Println(d.Format("Mon 2006-01-02"))
     }
@@ -1567,7 +1581,7 @@ func main() {
 }
 ```
 
-**Known limitation:** `GetWeekdaysInRange` has a conditional branch that, when
+**Known limitation:** `WeekdaysInRange` has a conditional branch that, when
 the date range falls within a leap year, only counts February 29 as a valid
 weekday and skips all other weekdays in that year. For date ranges that fall
 entirely within a non-leap year, the function works correctly. When working
@@ -1811,7 +1825,7 @@ func billingWindowFor(tc TenantCtx, t time.Time) (start, end time.Time) {
     // Convert the UTC time to the tenant's local timezone first,
     // then apply the rule-bound Timex methods so that month boundaries
     // are evaluated in the tenant's local calendar context.
-    local := timefy.AdjustTimezone(t, string(tc.Timezone))
+    local := timefy.InTimezoneOrSame(t, string(tc.Timezone))
     tx := tc.Rule.With(local)
     return tx.BeginningOfMonth(), tx.EndOfMonth()
 }
@@ -1875,8 +1889,8 @@ func main() {
 | User input (HTTP, CLI)    | `Parse`, `ParseInLocation`         | Returns `error` — handle it      |
 | Config file constants     | `MustParse`, `MustParseInLocation` | Panics — appropriate for startup |
 | Trusted internal code     | `MustParse`                        | Panics on programmer error       |
-| Dynamic timezone from DB  | `SetTimezone`                      | Returns `error` if TZ invalid    |
-| Trusted timezone constant | `AdjustTimezone`                   | Silent fallback on error         |
+| Dynamic timezone from DB  | `InTimezone`                       | Returns `error` if TZ invalid    |
+| Trusted timezone constant | `InTimezoneOrSame`                 | Silent fallback on error         |
 
 ```go
 // ✅ Safe pattern for HTTP handlers:
@@ -1916,7 +1930,7 @@ charges. Some plans include a free trial period.
 | `New(t).BeginningOfYear()`    | Annual period start              |
 | `New(t).EndOfYear()`          | Annual period end                |
 | `AddDay(t, n)`                | Trial expiry calculation         |
-| `AdjustTimezone`              | Tenant-local boundary evaluation |
+| `InTimezoneOrSame`            | Tenant-local boundary evaluation |
 | `IsLeapYear`                  | February billing edge case       |
 | `IsBetween`                   | Trial membership test            |
 | `DurationInDays`              | Pro-rate day counting            |
@@ -1935,7 +1949,7 @@ and generate cross-team working-day schedules that respect public holidays.
 
 | API                                | Purpose                          |
 | ---------------------------------- | -------------------------------- |
-| `AdjustTimezone`                   | Convert UTC probe times to local |
+| `InTimezoneOrSame`                 | Convert UTC probe times to local |
 | `New(t).IsWeekday()`               | Exclude weekends                 |
 | `AddHour(t, 1)`                    | Scan 1-hour overlap windows      |
 | `AddDay(t, 1)`                     | Advance day cursor               |
@@ -1965,7 +1979,7 @@ breaches for support tickets, and generates CISO reports.
 | `New(t).BeginningOfWeek()` / `EndOfWeek()`  | Weekly report window                |
 | `New(t).BeginningOfQuarter()` / `Quarter()` | Quarterly KPI window                |
 | `BeginOfDay` / `AddDay`                     | 90-day retention threshold          |
-| `FormatTimex`                               | Structured log timestamp extraction |
+| `DateParts`                                 | Structured log timestamp extraction |
 | `New(t).TimeAgo()`                          | Human-readable event age            |
 
 ```bash
@@ -1990,7 +2004,7 @@ calendar.
 | `AddDay(t, 45)`               | 10-Q filing deadline          |
 | `AddDay(t, 60)`               | 10-K filing deadline          |
 | `New(t).DurationInDays`       | Days-until-deadline countdown |
-| `GetWeekdaysInRange`          | Trading-day count             |
+| `WeekdaysInRange`             | Trading-day count             |
 | `IsLeapYear`                  | February calendar check       |
 | `New(t).Quarter()`            | Quarter number label          |
 
@@ -2015,7 +2029,7 @@ are not duplicated within a configurable time window.
 | `AddHour(t, 1)`                            | Business-hour SLA tick           |
 | `AddMinute(t, -n)`                         | Anti-duplication window start    |
 | `New(t).IsBetween`                         | Duplicate-run detection          |
-| `GetWeekdaysInRange`                       | Week overview rendering          |
+| `WeekdaysInRange`                          | Week overview rendering          |
 | `New(t).Quarter()`                         | Quarter label on schedule output |
 | `New(t).BeginningOfWeek()` / `EndOfWeek()` | Week schedule bounds             |
 | `New(t).TimeAgo()` / `TimeUntil()`         | Last-ran / next-run display      |
@@ -2049,7 +2063,7 @@ cd examples/scheduler && go run main.go
 | `EndOfQuarter()`                 | `time.Time`          | Last ns of current quarter      |
 | `EndOfYear()`                    | `time.Time`          | Dec 31 23:59:59.999999999       |
 | `BeginOfDay(t)`                  | `time.Time`          | Midnight of date t              |
-| `FEndOfDay(t)`                   | `time.Time`          | 23:59:59 of date t              |
+| `EndOfDayOf(t)`                  | `time.Time`          | 23:59:59 of date t              |
 | `PrevBeginOfDay(t, n)`           | `time.Time`          | Midnight n days before t        |
 | `PrevEndOfDay(t, n)`             | `time.Time`          | 23:59:59 n days before t        |
 | `AddSecond(t, n)`                | `time.Time`          | t ± n seconds                   |
@@ -2072,20 +2086,20 @@ cd examples/scheduler && go run main.go
 | `Between(t1, t2)`                | `bool`               | Is now between t1 and t2?       |
 | `FormatRFC(layout)`              | `string`             | Format now with layout          |
 | `FormatRFCshort(layout)`         | `string`             | Format now with short layout    |
-| `FFormatRFC(t, layout)`          | `string`             | Format t with layout            |
-| `FFormatRFCshort(t, layout)`     | `string`             | Format t with short layout      |
+| `FormatRFCAt(t, layout)`         | `string`             | Format t with layout            |
+| `FormatRFCshortAt(t, layout)`    | `string`             | Format t with short layout      |
 | `DefaultFormatRFC()`             | `string`             | Format now (microseconds)       |
-| `FDefaultFormatRFC(t)`           | `string`             | Format t (microseconds)         |
-| `SetTimezone(t, tz)`             | `(time.Time, error)` | Convert to timezone             |
-| `AdjustTimezone(t, tz)`          | `time.Time`          | Convert; fallback on error      |
+| `DefaultFormatRFCAt(t)`          | `string`             | Format t (microseconds)         |
+| `InTimezone(t, tz)`              | `(time.Time, error)` | Convert to timezone             |
+| `InTimezoneOrSame(t, tz)`        | `time.Time`          | Convert; fallback on error      |
 | `IsLeapYear(year)`               | `bool`               | Is year a leap year?            |
-| `IsLeapYearN(t)`                 | `bool`               | Is t.Year() a leap year?        |
+| `IsLeapYearOf(t)`                | `bool`               | Is t.Year() a leap year?        |
 | `IsWithinTolerance(t)`           | `bool`               | Is t within ±1 minute of now?   |
 | `SinceHour(t)`                   | `float64`            | Hours since t                   |
 | `SinceMinute(t)`                 | `float64`            | Minutes since t                 |
 | `SinceSecond(t)`                 | `float64`            | Seconds since t                 |
-| `GetWeekdaysInRange(s, e)`       | `[]time.Time`        | Mon–Fri dates in [s,e]          |
-| `FormatTimex(t)`                 | `[]int`              | [ns, sec, min, hr, day, mo, yr] |
+| `WeekdaysInRange(s, e)`          | `[]time.Time`        | Mon–Fri dates in [s,e]          |
+| `DateParts(t)`                   | `[]int`              | [ns, sec, min, hr, day, mo, yr] |
 | `NewRule()`                      | `*Rule`              | New config with defaults        |
 
 ### Timex methods

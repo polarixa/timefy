@@ -1005,7 +1005,7 @@ func (t *Timex) Parse(s ...string) (value time.Time, err error) {
 		lastErr         error
 	)
 
-	currentTime = FormatTimex(base)
+	currentTime = DateParts(base)
 
 	for _, str := range s {
 		parsedValue, layout, perr := t.parseWithFormat(str, currentLocation)
@@ -1021,7 +1021,7 @@ func (t *Timex) Parse(s ...string) (value time.Time, err error) {
 		onlyTimeInStr = hasTimeInStr && onlyTimeInStr && TimeOnlyRegexp.MatchString(str)
 
 		location := parsedValue.Location()
-		parseTime = FormatTimex(parsedValue)
+		parseTime = DateParts(parsedValue)
 
 		for i, v := range parseTime {
 			// Don't reset hour, minute, second if current time str including time
@@ -1047,7 +1047,7 @@ func (t *Timex) Parse(s ...string) (value time.Time, err error) {
 			}
 		}
 		result = time.Date(parseTime[6], time.Month(parseTime[5]), parseTime[4], parseTime[3], parseTime[2], parseTime[1], parseTime[0], location)
-		currentTime = FormatTimex(result)
+		currentTime = DateParts(result)
 		parsed = true
 	}
 

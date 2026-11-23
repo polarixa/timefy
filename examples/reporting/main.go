@@ -23,12 +23,12 @@ import (
 
 // QuarterPeriod holds the boundaries and metadata for a single reporting quarter.
 type QuarterPeriod struct {
-	Label    string    // e.g. "Q3 FY2025"
-	Start    time.Time
-	End      time.Time
+	Label          string // e.g. "Q3 FY2025"
+	Start          time.Time
+	End            time.Time
 	FilingDeadline time.Time // SEC 10-Q deadline
-	Quarter  uint
-	FiscalYear int
+	Quarter        uint
+	FiscalYear     int
 }
 
 // FiscalYear holds boundaries for a full fiscal year (non-calendar).
@@ -75,11 +75,12 @@ func calendarQuarterPeriod(t time.Time) QuarterPeriod {
 // fiscalQuarterPeriod returns the QuarterPeriod for a July-1-start fiscal year.
 //
 // Fiscal year convention used here (common in technology companies):
-//   FY2025 = July 1 2024 → June 30 2025
-//   FQ1 FY2025 = Jul 1 – Sep 30 2024
-//   FQ2 FY2025 = Oct 1 – Dec 31 2024
-//   FQ3 FY2025 = Jan 1 – Mar 31 2025
-//   FQ4 FY2025 = Apr 1 – Jun 30 2025
+//
+//	FY2025 = July 1 2024 → June 30 2025
+//	FQ1 FY2025 = Jul 1 – Sep 30 2024
+//	FQ2 FY2025 = Oct 1 – Dec 31 2024
+//	FQ3 FY2025 = Jan 1 – Mar 31 2025
+//	FQ4 FY2025 = Apr 1 – Jun 30 2025
 //
 // Because timefy operates on calendar months, we adjust the reference month
 // by −6 to align with the fiscal-year start before calling BeginningOfQuarter.
@@ -278,7 +279,7 @@ func main() {
 	// ── Weekdays in Q1 2025 (for trading-day count) ──────────────────────────
 	q1Start := time.Date(2025, time.January, 1, 0, 0, 0, 0, time.UTC)
 	q1End := time.Date(2025, time.March, 31, 0, 0, 0, 0, time.UTC)
-	weekdays := timefy.GetWeekdaysInRange(q1Start, q1End)
+	weekdays := timefy.WeekdaysInRange(q1Start, q1End)
 	fmt.Printf("\n  Trading days in Q1 2025 (Mon–Fri): %d\n", len(weekdays))
 
 	// ── Half-year reporting window (H1 / H2) ─────────────────────────────────

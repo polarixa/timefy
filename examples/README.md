@@ -23,18 +23,11 @@ states what it shows and the exact output it prints.
 | 08  | [08_relative_time](08_relative_time/main.go)         | `TimeAgo` and `TimeUntil`.                                                                   | `go run ./examples/08_relative_time`     |
 | 09  | [09_package_level](09_package_level/main.go)         | Package-level helpers: `BeginOfDay`, `Add*`, `Since*`, week start, `Parse*`, RFC formatting. | `go run ./examples/09_package_level`     |
 | 10  | [10_timezones](10_timezones/main.go)                 | `InTimezone` (strict), `InTimezoneOrSame` (lenient), `DefaultTimezone*`.                     | `go run ./examples/10_timezones`         |
-
-## Scenario examples
-
-Longer, domain-flavoured programs. Run each with `go run ./examples/<name>`.
-
-| Case                               | Scenario                                                    |
-| ---------------------------------- | ----------------------------------------------------------- |
-| [audit](audit/main.go)             | Enterprise audit trail and GDPR breach-notification timing. |
-| [billing](billing/main.go)         | SaaS subscription billing period calculations.              |
-| [global_team](global_team/main.go) | Multi-timezone global team coordination.                    |
-| [reporting](reporting/main.go)     | Financial quarter and fiscal-year reporting.                |
-| [scheduler](scheduler/main.go)     | Business-day-aware job scheduler.                           |
+| 11  | [11_billing](11_billing/main.go)                     | `BeginningOf*`/`EndOf*`, `AddDay`, `DurationInDays`: SaaS subscription billing periods.      | `go run ./examples/11_billing`           |
+| 12  | [12_global_team](12_global_team/main.go)             | `InTimezoneOrSame`: multi-timezone global team coordination.                                 | `go run ./examples/12_global_team`       |
+| 13  | [13_audit](13_audit/main.go)                         | Enterprise audit trail and GDPR breach-notification timing.                                  | `go run ./examples/13_audit`             |
+| 14  | [14_reporting](14_reporting/main.go)                 | Financial quarter and fiscal-year reporting.                                                 | `go run ./examples/14_reporting`         |
+| 15  | [15_scheduler](15_scheduler/main.go)                 | Business-day-aware job scheduler.                                                            | `go run ./examples/15_scheduler`         |
 
 ## Running everything
 

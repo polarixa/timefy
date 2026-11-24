@@ -71,11 +71,11 @@
     - [23.3 Custom Format Registries](#233-custom-format-registries)
     - [23.4 Safe vs Panic Patterns](#234-safe-vs-panic-patterns)
   - [24. Enterprise Use Cases](#24-enterprise-use-cases)
-    - [`examples/billing/` — SaaS Subscription Billing](#examplesbilling--saas-subscription-billing)
-    - [`examples/global_team/` — Multi-Timezone Team Coordination](#examplesglobal_team--multi-timezone-team-coordination)
-    - [`examples/audit/` — Enterprise Audit Trail \& Compliance](#examplesaudit--enterprise-audit-trail--compliance)
-    - [`examples/reporting/` — Financial Quarter \& Fiscal-Year Reporting](#examplesreporting--financial-quarter--fiscal-year-reporting)
-    - [`examples/scheduler/` — Business-Day-Aware Job Scheduler](#examplesscheduler--business-day-aware-job-scheduler)
+    - [`examples/11_billing/` — SaaS Subscription Billing](#examples11_billing--saas-subscription-billing)
+    - [`examples/12_global_team/` — Multi-Timezone Team Coordination](#examples12_global_team--multi-timezone-team-coordination)
+    - [`examples/13_audit/` — Enterprise Audit Trail \& Compliance](#examples13_audit--enterprise-audit-trail--compliance)
+    - [`examples/14_reporting/` — Financial Quarter \& Fiscal-Year Reporting](#examples14_reporting--financial-quarter--fiscal-year-reporting)
+    - [`examples/15_scheduler/` — Business-Day-Aware Job Scheduler](#examples15_scheduler--business-day-aware-job-scheduler)
   - [25. API Quick-Reference](#25-api-quick-reference)
     - [Package-level functions](#package-level-functions)
     - [Timex methods](#timex-methods)
@@ -1913,7 +1913,7 @@ var startOfEpoch = timefy.MustParse("2020-01-01")
 The `examples/` directory contains five complete, runnable enterprise programs
 that demonstrate production-grade patterns.
 
-### `examples/billing/` — SaaS Subscription Billing
+### `examples/11_billing/` — SaaS Subscription Billing
 
 **Business problem:** A multi-tenant SaaS platform bills customers monthly,
 quarterly, and annually. Customers sign up mid-period and receive pro-rated
@@ -1936,10 +1936,10 @@ charges. Some plans include a free trial period.
 | `DurationInDays`              | Pro-rate day counting            |
 
 ```bash
-cd examples/billing && go run main.go
+cd examples/11_billing && go run main.go
 ```
 
-### `examples/global_team/` — Multi-Timezone Team Coordination
+### `examples/12_global_team/` — Multi-Timezone Team Coordination
 
 **Business problem:** An engineering organization spans five cities. The
 platform must find meeting overlap windows, detect business-hour availability,
@@ -1958,10 +1958,10 @@ and generate cross-team working-day schedules that respect public holidays.
 | `New(t).TimeAgo()` / `TimeUntil()` | Release timeline display         |
 
 ```bash
-cd examples/global_team && go run main.go
+cd examples/12_global_team && go run main.go
 ```
 
-### `examples/audit/` — Enterprise Audit Trail & Compliance
+### `examples/13_audit/` — Enterprise Audit Trail & Compliance
 
 **Business problem:** A financial services platform records all data-access
 events, enforces GDPR Article 33 (72-hour breach notification), detects SLA
@@ -1983,10 +1983,10 @@ breaches for support tickets, and generates CISO reports.
 | `New(t).TimeAgo()`                          | Human-readable event age            |
 
 ```bash
-cd examples/audit && go run main.go
+cd examples/13_audit && go run main.go
 ```
 
-### `examples/reporting/` — Financial Quarter & Fiscal-Year Reporting
+### `examples/14_reporting/` — Financial Quarter & Fiscal-Year Reporting
 
 **Business problem:** A publicly-traded company needs precise SEC filing
 windows, YTD periods, QoQ comparisons, and a July-1-start fiscal year
@@ -2009,10 +2009,10 @@ calendar.
 | `New(t).Quarter()`            | Quarter number label          |
 
 ```bash
-cd examples/reporting && go run main.go
+cd examples/14_reporting && go run main.go
 ```
 
-### `examples/scheduler/` — Business-Day-Aware Job Scheduler
+### `examples/15_scheduler/` — Business-Day-Aware Job Scheduler
 
 **Business problem:** A financial data platform schedules ETL jobs on daily,
 monthly, and quarterly boundaries, ensuring jobs fire only on business days and
@@ -2035,7 +2035,7 @@ are not duplicated within a configurable time window.
 | `New(t).TimeAgo()` / `TimeUntil()`         | Last-ran / next-run display      |
 
 ```bash
-cd examples/scheduler && go run main.go
+cd examples/15_scheduler && go run main.go
 ```
 
 ---

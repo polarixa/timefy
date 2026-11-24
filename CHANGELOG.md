@@ -41,7 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   argument order no longer matters. `Parse()` with no arguments now returns an
   error instead of a zero `time.Time` and a nil error (**breaking** for callers
   that relied on the zero-value result).
-- Rewrote `README.md` and `docs/GETTING_STARTED.md` around the public API, with
+- Rewrote `README.md` and `docs/guides/getting-started.md` around the public API, with
   a table of contents and links to the runnable examples, and corrected the
   documented weekday behavior (the returned day is inside the current
   Monday-to-Sunday week; the code itself is unchanged).

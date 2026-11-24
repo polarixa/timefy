@@ -14,7 +14,7 @@
 //
 // Run with:
 //
-//	cd examples/scheduler && go run main.go
+//	cd examples/15_scheduler && go run main.go
 package main
 
 import (

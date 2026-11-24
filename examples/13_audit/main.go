@@ -12,7 +12,7 @@
 //
 // Run with:
 //
-//	cd examples/audit && go run main.go
+//	cd examples/13_audit && go run main.go
 package main
 
 import (

@@ -1,12 +1,51 @@
 # timefy
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/polarixa/timefy.svg)](https://pkg.go.dev/github.com/polarixa/timefy)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/polarixa/timefy)](go.mod)
+[![Release](https://img.shields.io/github/v/tag/polarixa/timefy?label=release)](https://github.com/polarixa/timefy/tags)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
+
+> A Go library of time utilities: period boundaries, weekdays, parsing, timezones, durations and relative time.
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Usage Examples](#usage-examples)
+- [API Reference](#api-reference)
+- [Testing](#testing)
+- [Contributing](#contributing)
+- [License](#license)
+
+<a id="overview"></a>
+
+<details>
+<summary><strong>Overview</strong></summary>
+
 **timefy** is a comprehensive Go library designed to enhance productivity by offering a wide range of time-related utilities. Whether you're dealing with date formatting, time zone conversions, or scheduling. Timefy provides a robust toolkit to simplify time management tasks in Go applications.
 
-### Requirements
+**Why it exists.** Go's `time` package gives you the primitives but not the everyday helpers: start/end of a period, week-start rules, lenient parsing, relative phrasing. timefy wraps `time.Time` in a `Timex` value (and a configurable `Rule`) so these are one call each, with package-level shortcuts that use the current time.
 
-- Go version 1.23 or higher
+**Key features**
 
-### Installation
+- Period boundaries from minute to year (`BeginningOf*` / `EndOf*`), including quarter and half-year.
+- Weekday helpers (`Monday` … `Sunday`), configurable week start, weekday ranges.
+- Flexible string parsing (`Parse`, `MustParse`, `ParseInLocation`) with extensible layouts.
+- Timezone conversion, comparisons (`Is*`, `Between`), durations, `TimeAgo` / `TimeUntil`.
+
+**Use it when** you do calendar-style arithmetic and parsing in Go services or CLIs. **Skip it when** you only need `time.Now()` and `Format`, or need a full calendar/recurrence engine (holidays, recurring rules), which timefy does not provide.
+
+**Status.** Pre-1.0 (tags are `v0.0.x`); the API may still change between releases.
+
+</details>
+
+<a id="installation"></a>
+
+<details>
+<summary><strong>Installation</strong></summary>
+
+**Prerequisites:** Go version 1.23 or higher.
 
 To install, you can use the following commands based on your preference:
 
@@ -21,19 +60,59 @@ To install, you can use the following commands based on your preference:
   go get github.com/polarixa/timefy@latest
   ```
 
-### Getting started
-
-#### Getting timefy
-
-With [Go's module support](https://go.dev/wiki/Modules#how-to-use-modules), `go [build|run|test]` automatically fetches the necessary dependencies when you add the import in your code:
+Import it in your code; `go build`/`go run`/`go test` fetch the dependency automatically with [Go's module support](https://go.dev/wiki/Modules#how-to-use-modules):
 
 ```go
 import "github.com/polarixa/timefy"
 ```
 
-#### Usage
+</details>
 
-> Calculating the time based on current time
+<a id="quick-start"></a>
+
+<details>
+<summary><strong>Quick Start</strong></summary>
+
+Requires Go 1.23+ on Linux, macOS or Windows. No network, environment variables or external services are needed.
+
+```bash
+mkdir demo && cd demo
+go mod init demo
+go get github.com/polarixa/timefy@latest
+```
+
+Create `main.go`:
+
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+
+	"github.com/polarixa/timefy"
+)
+
+func main() {
+	tx := timefy.New(time.Date(2025, 1, 15, 17, 51, 49, 0, time.UTC))
+	fmt.Println(tx.BeginningOfMonth()) // 2025-01-01 00:00:00 +0000 UTC
+	fmt.Println(tx.EndOfMonth())       // 2025-01-31 23:59:59.999999999 +0000 UTC
+}
+```
+
+```bash
+go run .
+```
+
+</details>
+
+<a id="usage-examples"></a>
+
+<details>
+<summary><strong>Usage Examples</strong></summary>
+
+<details>
+<summary>Calculating the time based on current time</summary>
 
 ```go
 package main
@@ -69,7 +148,10 @@ func main() {
 }
 ```
 
-> Calculating the time based on another time
+</details>
+
+<details>
+<summary>Calculating the time based on another time</summary>
 
 ```go
 package main
@@ -89,7 +171,10 @@ func main() {
 }
 ```
 
-> Calculating the time based on configuration
+</details>
+
+<details>
+<summary>Calculating the time based on configuration</summary>
 
 ```go
 package main
@@ -112,7 +197,10 @@ func main() {
 }
 ```
 
-> Monday / Sunday
+</details>
+
+<details>
+<summary>Monday / Sunday</summary>
 
 ```go
 package main
@@ -140,7 +228,10 @@ func main() {
 }
 ```
 
-> Parse String to Time
+</details>
+
+<details>
+<summary>Parse String to Time</summary>
 
 ```go
 package main
@@ -179,7 +270,10 @@ func main() {
 }
 ```
 
-> Parse in Location
+</details>
+
+<details>
+<summary>Parse in Location</summary>
 
 ```go
 package main
@@ -206,7 +300,10 @@ func main() {
 }
 ```
 
-> Day Operations
+</details>
+
+<details>
+<summary>Day Operations</summary>
 
 ```go
 package main
@@ -235,7 +332,10 @@ func main() {
 }
 ```
 
-> Time Manipulation (Add/Subtract)
+</details>
+
+<details>
+<summary>Time Manipulation (Add/Subtract)</summary>
 
 ```go
 package main
@@ -268,7 +368,10 @@ func main() {
 }
 ```
 
-> Timezone Utilities
+</details>
+
+<details>
+<summary>Timezone Utilities</summary>
 
 ```go
 package main
@@ -300,7 +403,10 @@ func main() {
 }
 ```
 
-> Leap Year & Tolerance Checks
+</details>
+
+<details>
+<summary>Leap Year & Tolerance Checks</summary>
 
 ```go
 package main
@@ -330,7 +436,10 @@ func main() {
 }
 ```
 
-> Between (String-based Range Check)
+</details>
+
+<details>
+<summary>Between (String-based Range Check)</summary>
 
 ```go
 package main
@@ -351,7 +460,10 @@ func main() {
 }
 ```
 
-> Quarter
+</details>
+
+<details>
+<summary>Quarter</summary>
 
 ```go
 package main
@@ -373,7 +485,10 @@ func main() {
 }
 ```
 
-> Since (Elapsed Time Calculations)
+</details>
+
+<details>
+<summary>Since (Elapsed Time Calculations)</summary>
 
 ```go
 package main
@@ -399,7 +514,10 @@ func main() {
 }
 ```
 
-> Weekdays in Range
+</details>
+
+<details>
+<summary>Weekdays in Range</summary>
 
 ```go
 package main
@@ -423,7 +541,10 @@ func main() {
 }
 ```
 
-> DateParts (Extract Time Components)
+</details>
+
+<details>
+<summary>DateParts (Extract Time Components)</summary>
 
 ```go
 package main
@@ -444,7 +565,10 @@ func main() {
 }
 ```
 
-> Formatting (RFC Layouts)
+</details>
+
+<details>
+<summary>Formatting (RFC Layouts)</summary>
 
 ```go
 package main
@@ -479,7 +603,10 @@ func main() {
 }
 ```
 
-> Relative Time (TimeAgo / TimeUntil)
+</details>
+
+<details>
+<summary>Relative Time (TimeAgo / TimeUntil)</summary>
 
 ```go
 package main
@@ -510,7 +637,10 @@ func main() {
 }
 ```
 
-> Duration Calculations
+</details>
+
+<details>
+<summary>Duration Calculations</summary>
 
 ```go
 package main
@@ -544,7 +674,10 @@ func main() {
 }
 ```
 
-> Day Type Checks (Weekend / Weekday)
+</details>
+
+<details>
+<summary>Day Type Checks (Weekend / Weekday)</summary>
 
 ```go
 package main
@@ -570,7 +703,10 @@ func main() {
 }
 ```
 
-> Time Comparison Helpers
+</details>
+
+<details>
+<summary>Time Comparison Helpers</summary>
 
 ```go
 package main
@@ -616,7 +752,10 @@ func main() {
 }
 ```
 
-> Temporal Checks (Today / Yesterday / Tomorrow / Past / Future)
+</details>
+
+<details>
+<summary>Temporal Checks (Today / Yesterday / Tomorrow / Past / Future)</summary>
 
 ```go
 package main
@@ -652,7 +791,10 @@ func main() {
 }
 ```
 
-> Global Convenience Functions (BeginningOf / EndOf)
+</details>
+
+<details>
+<summary>Global Convenience Functions (BeginningOf / EndOf)</summary>
 
 ```go
 package main
@@ -683,7 +825,10 @@ func main() {
 }
 ```
 
-> Configuration (Rule) — Complete API
+</details>
+
+<details>
+<summary>Configuration (Rule) — Complete API</summary>
 
 ```go
 package main
@@ -740,7 +885,65 @@ func main() {
 }
 ```
 
-### Contributing
+</details>
+
+<details>
+<summary>Runnable programs in <code>examples/</code></summary>
+
+Runnable programs live in [`examples/`](examples/README.md): focused API demos (`01`–`10`) and longer scenarios (`11`–`15`: billing, global team, audit, reporting, scheduler).
+
+```bash
+go run ./examples/01_quickstart
+```
+
+</details>
+
+</details>
+
+<a id="api-reference"></a>
+
+<details>
+<summary><strong>API / Configuration Reference</strong></summary>
+
+The package-level API, grouped. Run `go doc -all github.com/polarixa/timefy` for full signatures.
+
+| Area                             | Exported names                                                                                                                                                                                                                                                                  |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Construction                     | `New`, `With`, `NewRule`, `Rule` (`With`, `Parse`, `MustParse`, `WithWeekStartDay`, `WithTimeFormats`, `WithLocation`, `WithLocationRFC`, `ApplyUTCLoc`, `ApplyLocalLoc`, `AppendTimeFormat*`)                                                                                  |
+| Period boundaries (current time) | `BeginningOfMinute/Hour/Day/Week/Month/Quarter/Year`, `EndOfMinute/Hour/Day/Week/Month/Quarter/Year`, `Quarter`, `BeginOfDay`, `EndOfDayOf`, `PrevBeginOfDay`, `PrevEndOfDay`                                                                                                   |
+| Weekdays                         | `Monday` … `Sunday`, `EndOfSunday`, `WeekdaysInRange`, `GetWeekdaysInRange`, `SetWeekStartDay`, `GetWeekStartDay`, `WeekStartDay`                                                                                                                                               |
+| Parsing                          | `Parse`, `MustParse`, `ParseInLocation`, `MustParseInLocation`, `TimeFormats`, `TimeFormatRegexp`                                                                                                                                                                               |
+| Arithmetic and elapsed           | `AddSecond`, `AddMinute`, `AddHour`, `AddDay`, `SinceSecond`, `SinceMinute`, `SinceHour`                                                                                                                                                                                        |
+| Timezones                        | `InTimezone`, `InTimezoneOrSame`, `AdjustTimezone`, `SetTimezone`, `ZoneRFC` constants such as `DefaultTimezoneVietnam`                                                                                                                                                         |
+| Checks                           | `Between`, `IsLeapYear`, `IsLeapYearN`, `IsLeapYearOf`, `IsWithinTolerance`                                                                                                                                                                                                     |
+| Formatting                       | `FormatRFC`, `FormatRFCAt`, `FormatRFCshort`, `FormatRFCshortAt`, `DefaultFormatRFC`, `DefaultFormatRFCAt`, `FormatTimex`, `DateParts`, `TimeFormatRFC` / `TimeRFC` constants                                                                                                   |
+| `Timex` methods                  | `BeginningOf*`, `EndOf*`, `Monday`…`Sunday`, `Quarter`, `Is*` (`IsBefore`, `IsAfter`, `IsBetween`, `IsSameDay/Month/Year`, `IsToday`, `IsYesterday`, `IsTomorrow`, `IsPast`, `IsFuture`, `IsWeekend`, `IsWeekday`), `DurationInDays/Weeks/Months/Years`, `TimeAgo`, `TimeUntil` |
+
+Deprecated aliases (`FEndOfDay`, `FFormatRFC`, `FFormatRFCshort`, `FDefaultFormatRFC`) remain exported; prefer the non-`F` forms.
+
+</details>
+
+<a id="testing"></a>
+
+<details>
+<summary><strong>Testing &amp; Benchmarks</strong></summary>
+
+The repository ships unit and regression tests (`time_test.go`, `regression_test.go`). No benchmarks are defined at the moment.
+
+Run `make help` to list all targets. Common ones:
+
+```bash
+make test   # run all tests with coverage
+make lint   # go vet
+make check  # fmt-check, lint and test
+```
+
+</details>
+
+<a id="contributing"></a>
+
+<details>
+<summary><strong>Contributing</strong></summary>
 
 To contribute to project, follow these steps:
 
@@ -760,3 +963,16 @@ To contribute to project, follow these steps:
    ```bash
    go mod tidy
    ```
+
+There is no `CONTRIBUTING.md` yet; issues and pull requests are welcome. Run `make check` before submitting.
+
+</details>
+
+<a id="license"></a>
+
+<details>
+<summary><strong>License</strong></summary>
+
+Licensed under the [Apache License 2.0](LICENSE).
+
+</details>

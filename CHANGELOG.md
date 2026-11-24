@@ -5,6 +5,20 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2026-11-24
+
+### Added
+
+- Added `CHANGELOG.md`, documenting releases from `v1.0.0` onward with Keep a
+  Changelog categories and a compare link for each version.
+
+### Changed
+
+- Reorganized `docs/` by topic: the getting-started guide now lives at
+  `docs/guides/getting-started.md` and the release process at
+  `docs/operations/release.md`. File contents are unchanged; update any external
+  links or bookmarks that used the old flat paths.
+
 ## [1.0.0] - 2026-11-24
 
 ### Added
@@ -80,4 +94,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `AppendTimeFormatRFCshort` writing into the caller's backing array, which
   could corrupt a format slice reused across rules.
 
+[1.0.1]: https://github.com/polarixa/timefy/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/polarixa/timefy/compare/v0.0.8...v1.0.0
